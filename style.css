@@ -294,8 +294,8 @@ body {
 }
 
 .plant {
-    width: 75%;
-    height: 75%;
+    width: 80%;
+    height: 80%;
     object-fit: contain;
     position: absolute;
     z-index: 5;
@@ -315,8 +315,8 @@ body {
 
 .zombie {
     position: absolute;
-    width: 75%;
-    height: 75%;
+    width: 80%;
+    height: 80%;
     object-fit: contain;
     z-index: 7;
     pointer-events: none;
