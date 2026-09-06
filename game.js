@@ -1,4 +1,3 @@
-// game.js
 const IMAGES = {
     sunflower: 'https://fortport.ru/photo/55463',
     peashooter: 'https://fortport.ru/photo/55462',
@@ -380,7 +379,10 @@ class Game {
             speed: 0.7,
             eating: false,
             damageInterval: null,
-            eatingPlantCol: -1
+            eatingPlantCol: -1,
+            // Точный хитбокс зомби (в пикселях)
+            hitboxWidth: this.cellWidth * 0.65,
+            hitboxHeight: this.cellHeight * 0.65
         };
 
         this.zombies.push(zombieObj);
@@ -397,17 +399,23 @@ class Game {
             }
 
             let hasPlant = false;
+            // Обновляем размер хитбокса при изменении размера окна
+            const hitboxWidth = this.cellWidth * 0.65;
+            const hitboxHeight = this.cellHeight * 0.65;
+            
             for (let c = 0; c < this.cols; c++) {
                 if (this.plants[zombie.row][c]) {
                     const plantX = c * this.cellWidth;
-                    const zombieHitbox = {
-                        left: zombie.x,
-                        right: zombie.x + this.cellWidth * 0.75,
-                        top: 20,
-                        bottom: 60
-                    };
+                    const plantCenterX = plantX + this.cellWidth / 2;
+                    const zombieCenterX = zombie.x + hitboxWidth / 2;
                     
-                    if (zombieHitbox.right > plantX && zombieHitbox.left < plantX + this.cellWidth) {
+                    // Проверка пересечения хитбоксов
+                    const zombieLeft = zombie.x + (this.cellWidth * 0.75 - hitboxWidth) / 2;
+                    const zombieRight = zombieLeft + hitboxWidth;
+                    const plantLeft = plantX + (this.cellWidth - this.cellWidth * 0.75) / 2;
+                    const plantRight = plantLeft + this.cellWidth * 0.75;
+                    
+                    if (zombieRight > plantLeft && zombieLeft < plantRight) {
                         hasPlant = true;
                         if (!zombie.eating) {
                             zombie.eating = true;
@@ -431,6 +439,7 @@ class Game {
                 zombie.element.style.left = `${zombie.x}px`;
             }
 
+            // Проверка достижения левого края
             if (zombie.x < 60) {
                 this.activateMower(zombie.row);
                 zombie.alive = false;
@@ -499,7 +508,11 @@ class Game {
 
             this.zombies.forEach(zombie => {
                 if (zombie.row === row && zombie.alive) {
-                    if (Math.abs(x - zombie.x) < 40) {
+                    const hitboxWidth = this.cellWidth * 0.65;
+                    const zombieLeft = zombie.x + (this.cellWidth * 0.75 - hitboxWidth) / 2;
+                    const zombieRight = zombieLeft + hitboxWidth;
+                    
+                    if (x + 40 > zombieLeft && x < zombieRight) {
                         this.flashElement(zombie.element, 'flash-white', 300);
                         zombie.hp -= 200;
                         if (zombie.hp <= 0) {
@@ -554,7 +567,11 @@ class Game {
 
             this.zombies.forEach(zombie => {
                 if (zombie.row === row && zombie.alive) {
-                    if (Math.abs(projectileObj.x - zombie.x) < 30) {
+                    const hitboxWidth = this.cellWidth * 0.65;
+                    const zombieLeft = zombie.x + (this.cellWidth * 0.75 - hitboxWidth) / 2;
+                    const zombieRight = zombieLeft + hitboxWidth;
+                    
+                    if (projectileObj.x > zombieLeft && projectileObj.x < zombieRight) {
                         zombie.hp -= 20;
                         projectileObj.active = false;
                         projectileObj.element.remove();
