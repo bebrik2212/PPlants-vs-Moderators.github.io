@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Plants vs Zombies — Дневная Лужайка</title>
     <style>
-        /* =========================================
-           GLOBAL RESET
-           ========================================= */
         * {
             margin: 0;
             padding: 0;
@@ -41,10 +38,6 @@
             box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
 
-        /* =========================================
-           CLASSIC PVZ HUD
-           ========================================= */
-
         .top-bar {
             position: relative;
             display: flex;
@@ -73,7 +66,6 @@
             z-index: 100;
         }
 
-        /* декоративная текстура дерева */
         .top-bar::before {
             content: "";
             position: absolute;
@@ -92,10 +84,6 @@
 
             opacity: 0.7;
         }
-
-        /* =========================================
-           SUN METER
-           ========================================= */
 
         .sun-meter {
             position: relative;
@@ -201,10 +189,6 @@
             text-shadow: 0 1px #fff;
         }
 
-        /* =========================================
-           SEED BANK
-           ========================================= */
-
         .seed-bank {
             display: flex;
             gap: 3px;
@@ -214,10 +198,6 @@
 
             z-index: 2;
         }
-
-        /* =========================================
-           SEED CARD
-           ========================================= */
 
         .seed {
             position: relative;
@@ -324,10 +304,6 @@
             text-shadow: 0 1px #fff;
         }
 
-        /* =========================================
-           LAWN
-           ========================================= */
-
         .lawn-container {
             position: relative;
             flex: 1;
@@ -402,8 +378,8 @@
 
         .zombie {
             position: absolute;
-            width: 60px;
-            height: 70px;
+            width: 75%;
+            height: 75%;
             object-fit: contain;
             z-index: 7;
             pointer-events: none;
@@ -465,13 +441,102 @@
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
             transform: translate(-50%, -50%);
         }
+
+        @media (max-height: 700px) {
+            .top-bar {
+                height: 60px;
+            }
+            .sun-meter {
+                width: 60px;
+                height: 60px;
+            }
+            .sun-orb {
+                width: 44px;
+                height: 44px;
+            }
+            .sun-orb img {
+                width: 36px;
+                height: 36px;
+            }
+            .sun-count-wrapper {
+                top: 46px;
+                left: 4px;
+                width: 44px;
+                height: 18px;
+            }
+            .sun-count-wrapper span {
+                font-size: 14px;
+            }
+            .seed {
+                width: 42px;
+                height: 56px;
+                margin-top: 2px;
+            }
+            .seed img {
+                width: 34px;
+                height: 34px;
+            }
+            .seed .cost {
+                height: 14px;
+                font-size: 10px;
+            }
+            .seed-image {
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .top-bar {
+                height: 60px;
+            }
+            .sun-meter {
+                width: 55px;
+                height: 60px;
+                margin-left: 2px;
+            }
+            .sun-orb {
+                width: 40px;
+                height: 40px;
+                margin-top: -2px;
+            }
+            .sun-orb img {
+                width: 32px;
+                height: 32px;
+            }
+            .sun-count-wrapper {
+                top: 42px;
+                left: 2px;
+                width: 40px;
+                height: 16px;
+            }
+            .sun-count-wrapper span {
+                font-size: 12px;
+            }
+            .seed {
+                width: 36px;
+                height: 50px;
+                margin-top: 2px;
+            }
+            .seed img {
+                width: 28px;
+                height: 28px;
+            }
+            .seed .cost {
+                height: 13px;
+                font-size: 9px;
+            }
+            .seed-image {
+                height: 34px;
+            }
+            .seed-bank {
+                gap: 2px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <!-- =========================================
-             CLASSIC PVZ HUD
-             ========================================= -->
+
         <div class="top-bar">
             <div class="sun-meter">
                 <div class="sun-orb">
@@ -753,7 +818,6 @@
                     lastShot: 0,
                     lastSun: Date.now(),
                     hp: 100,
-                    // Для подсолнуха: первое солнце через 5-7 секунд
                     firstSunDelay: type === 'sunflower' ? 5000 + Math.random() * 2000 : 0,
                     firstSunDone: false
                 };
@@ -877,7 +941,7 @@
                 const rowElement = document.querySelector(`.row[data-row="${row}"]`);
                 const rowWidth = rowElement.getBoundingClientRect().width;
                 zombie.style.left = `${rowWidth + 50}px`;
-                zombie.style.top = `${this.cellHeight / 2 - 35}px`;
+                zombie.style.top = `${this.cellHeight / 2 - (this.cellHeight * 0.75 / 2)}px`;
 
                 rowElement.appendChild(zombie);
 
@@ -913,7 +977,7 @@
                             const plantX = c * this.cellWidth;
                             const zombieHitbox = {
                                 left: zombie.x,
-                                right: zombie.x + 50,
+                                right: zombie.x + this.cellWidth * 0.75,
                                 top: 20,
                                 bottom: 60
                             };
@@ -1116,7 +1180,6 @@
                     for (let c = 0; c < this.cols; c++) {
                         const plant = this.plants[r][c];
                         if (plant && plant.type === 'sunflower') {
-                            // Первое солнце через 5-7 секунд после посадки
                             if (!plant.firstSunDone) {
                                 if (now - plant.lastSun >= plant.firstSunDelay) {
                                     plant.firstSunDone = true;
@@ -1124,7 +1187,6 @@
                                     this.spawnSunFromPlant(r, c);
                                 }
                             } else {
-                                // Затем каждые 24 секунды
                                 if (now - plant.lastSun >= 24000) {
                                     plant.lastSun = now;
                                     this.spawnSunFromPlant(r, c);
@@ -1138,7 +1200,6 @@
             startGame() {
                 this.gameRunning = true;
                 
-                // Бесконечный спавн зомби, но редко - по 1 каждые 8 секунд
                 const zombieInterval = setInterval(() => {
                     if (this.gameRunning) {
                         this.spawnZombie();
@@ -1176,5 +1237,4 @@
         const game = new Game();
     </script>
 </body>
-</html>
 </html>
