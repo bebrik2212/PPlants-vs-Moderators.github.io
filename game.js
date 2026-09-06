@@ -274,7 +274,6 @@ class Game {
         const rowElement = document.querySelector(`.row[data-row="${row}"]`);
         const cellWidth = this.cellWidth;
         
-        // Солнце появляется строго в пределах клетки
         const sunX = col * cellWidth + cellWidth / 2 - 20;
         sun.style.left = `${sunX}px`;
         sun.style.top = '-50px';
@@ -291,7 +290,6 @@ class Game {
             y += 3;
             sun.style.top = `${y}px`;
             
-            // Солнце останавливается строго в клетке
             if (y >= row * this.cellHeight + this.cellHeight / 2 - 20) {
                 clearInterval(fallInterval);
                 sun.style.cursor = 'pointer';
@@ -325,7 +323,6 @@ class Game {
         const rowElement = document.querySelector(`.row[data-row="${row}"]`);
         const cellWidth = this.cellWidth;
         
-        // Солнце появляется строго над подсолнухом
         const sunX = col * cellWidth + cellWidth / 2 - 20;
         const sunY = row * this.cellHeight + this.cellHeight / 2 - 20;
         sun.style.left = `${sunX}px`;
@@ -374,26 +371,22 @@ class Game {
         const rowElement = document.querySelector(`.row[data-row="${row}"]`);
         const rowWidth = rowElement.getBoundingClientRect().width;
         
-        // Зомби появляется строго справа от игрового поля
-        const lawnWidth = rowWidth;
-        zombie.style.left = `${lawnWidth + 10}px`;
-        zombie.style.top = `${this.cellHeight / 2 - (this.cellHeight * 0.75 / 2)}px`;
+        zombie.style.left = `${rowWidth + 10}px`;
+        zombie.style.top = `${this.cellHeight / 2 - (this.cellHeight * 0.8 / 2)}px`;
 
         rowElement.appendChild(zombie);
 
         const zombieObj = {
             id: Date.now() + Math.random(),
             row: row,
-            x: lawnWidth + 10,
+            x: rowWidth + 10,
             hp: 200,
             element: zombie,
             alive: true,
             speed: 0.7,
             eating: false,
             damageInterval: null,
-            eatingPlantCol: -1,
-            hitboxWidth: this.cellWidth * 0.65,
-            hitboxHeight: this.cellHeight * 0.65
+            eatingPlantCol: -1
         };
 
         this.zombies.push(zombieObj);
@@ -410,20 +403,15 @@ class Game {
             }
 
             let hasPlant = false;
-            const hitboxWidth = this.cellWidth * 0.65;
+            const zombieWidth = this.cellWidth * 0.8;
+            const plantWidth = this.cellWidth * 0.8;
             
             for (let c = 0; c < this.cols; c++) {
                 if (this.plants[zombie.row][c]) {
-                    const plantX = c * this.cellWidth;
-                    const plantCenterX = plantX + this.cellWidth / 2;
-                    const zombieCenterX = zombie.x + hitboxWidth / 2;
+                    const plantX = c * this.cellWidth + (this.cellWidth - plantWidth) / 2;
+                    const zombieX = zombie.x + (this.cellWidth - zombieWidth) / 2;
                     
-                    const zombieLeft = zombie.x + (this.cellWidth * 0.75 - hitboxWidth) / 2;
-                    const zombieRight = zombieLeft + hitboxWidth;
-                    const plantLeft = plantX + (this.cellWidth - this.cellWidth * 0.75) / 2;
-                    const plantRight = plantLeft + this.cellWidth * 0.75;
-                    
-                    if (zombieRight > plantLeft && zombieLeft < plantRight) {
+                    if (zombieX + zombieWidth > plantX && zombieX < plantX + plantWidth) {
                         hasPlant = true;
                         if (!zombie.eating) {
                             zombie.eating = true;
@@ -447,7 +435,6 @@ class Game {
                 zombie.element.style.left = `${zombie.x}px`;
             }
 
-            // Зомби исчезает только когда доходит до левого края поля
             if (zombie.x < 10) {
                 this.activateMower(zombie.row);
                 zombie.alive = false;
@@ -516,11 +503,10 @@ class Game {
 
             this.zombies.forEach(zombie => {
                 if (zombie.row === row && zombie.alive) {
-                    const hitboxWidth = this.cellWidth * 0.65;
-                    const zombieLeft = zombie.x + (this.cellWidth * 0.75 - hitboxWidth) / 2;
-                    const zombieRight = zombieLeft + hitboxWidth;
+                    const zombieWidth = this.cellWidth * 0.8;
+                    const zombieX = zombie.x + (this.cellWidth - zombieWidth) / 2;
                     
-                    if (x + 40 > zombieLeft && x < zombieRight) {
+                    if (x + 40 > zombieX && x < zombieX + zombieWidth) {
                         this.flashElement(zombie.element, 'flash-white', 300);
                         zombie.hp -= 200;
                         if (zombie.hp <= 0) {
@@ -575,11 +561,10 @@ class Game {
 
             this.zombies.forEach(zombie => {
                 if (zombie.row === row && zombie.alive) {
-                    const hitboxWidth = this.cellWidth * 0.65;
-                    const zombieLeft = zombie.x + (this.cellWidth * 0.75 - hitboxWidth) / 2;
-                    const zombieRight = zombieLeft + hitboxWidth;
+                    const zombieWidth = this.cellWidth * 0.8;
+                    const zombieX = zombie.x + (this.cellWidth - zombieWidth) / 2;
                     
-                    if (projectileObj.x > zombieLeft && projectileObj.x < zombieRight) {
+                    if (projectileObj.x > zombieX && projectileObj.x < zombieX + zombieWidth) {
                         zombie.hp -= 20;
                         projectileObj.active = false;
                         projectileObj.element.remove();
@@ -598,7 +583,6 @@ class Game {
                 }
             });
 
-            // Снаряд исчезает только за пределами игрового поля
             if (projectileObj.x > window.innerWidth + 50) {
                 projectileObj.active = false;
                 projectileObj.element.remove();
