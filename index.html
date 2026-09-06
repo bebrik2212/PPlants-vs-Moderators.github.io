@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Plants vs Zombies - Дневная Лужайка</title>
+    <title>Plants vs Zombies — Дневная Лужайка</title>
     <style>
         * {
             margin: 0;
@@ -14,7 +14,7 @@
         }
 
         body {
-            background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 50%, #1a3e1f 50%, #2d5a2a 100%);
+            background: #1a3e1f;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -27,15 +27,13 @@
         }
 
         .game-container {
-            width: 100vw;
-            height: 100vh;
-            background: #5b8c4e;
+            width: min(100vw, calc(100vh * 1.6));
+            height: min(100vh, calc(100vw / 1.6));
             position: relative;
             display: flex;
             flex-direction: column;
-            padding: 10px;
-            box-shadow: none;
-            border-radius: 0;
+            background: #5b8c4e;
+            margin: auto;
         }
 
         .top-bar {
@@ -44,10 +42,10 @@
             justify-content: space-between;
             background: #c4a26b;
             padding: 10px 20px;
-            border-radius: 15px;
-            border: 3px solid #7a5c3a;
-            margin-bottom: 10px;
+            border-bottom: 3px solid #7a5c3a;
             flex-shrink: 0;
+            height: 80px;
+            z-index: 100;
         }
 
         .sun-counter {
@@ -61,6 +59,7 @@
             font-weight: bold;
             color: #3b2a0e;
             border: 3px solid #aa8b55;
+            min-width: 150px;
         }
 
         .sun-counter img {
@@ -74,10 +73,10 @@
         }
 
         .seed {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: #e7d6b5;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -106,54 +105,50 @@
         }
 
         .seed img {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             object-fit: contain;
         }
 
         .seed .cost {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             color: #2b1c09;
             background: #fcf3da;
-            padding: 2px 10px;
+            padding: 2px 8px;
             border-radius: 10px;
             margin-top: 2px;
         }
 
         .lawn-container {
             position: relative;
-            background: #6da554;
-            border-radius: 15px;
-            padding: 10px;
-            border: 4px solid #3e6b2c;
-            overflow: hidden;
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            overflow: hidden;
         }
 
         .lawn {
             display: grid;
             grid-template-rows: repeat(5, 1fr);
-            gap: 5px;
+            gap: 0;
             position: relative;
             width: 100%;
             height: 100%;
+            max-width: 1400px;
         }
 
         .row {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
-            gap: 5px;
+            gap: 0;
             position: relative;
             min-height: 0;
-            border-radius: 3px;
         }
 
         .cell {
-            border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -163,52 +158,39 @@
             transition: all 0.2s;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             aspect-ratio: 1;
         }
 
         .cell:hover {
             filter: brightness(1.3);
-            transform: scale(1.03);
             z-index: 1;
         }
 
         .cell.occupied {
             cursor: not-allowed;
             filter: none;
-            transform: none;
         }
 
         .plant {
-            width: 70%;
-            height: 70%;
+            width: 75%;
+            height: 75%;
             object-fit: contain;
             position: absolute;
             z-index: 5;
             pointer-events: none;
-            animation: plantIn 0.4s ease-out;
             filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
-        }
-
-        @keyframes plantIn {
-            from {
-                transform: scale(0) rotate(-180deg);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
         }
 
         .zombie {
             position: absolute;
-            width: 65px;
-            height: 75px;
+            width: 60px;
+            height: 70px;
             object-fit: contain;
             z-index: 7;
             pointer-events: none;
             filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
-            transition: right 0.05s linear;
+            transition: none;
         }
 
         .projectile {
@@ -219,19 +201,20 @@
             z-index: 6;
             pointer-events: none;
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+            transition: none;
         }
 
         .mower {
             position: absolute;
-            width: 75px;
-            height: 65px;
+            width: 70px;
+            height: 60px;
             object-fit: contain;
             z-index: 9;
             pointer-events: none;
             filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
             left: -15px;
-            bottom: 10px;
-            transition: left 0.1s linear;
+            bottom: 5px;
+            transition: none;
         }
 
         .sun {
@@ -304,7 +287,9 @@
             zombie: 'https://fortport.ru/photo/4059',
             projectile: 'https://foni.papik.pro/uploads/posts/2024-09/foni-papik-pro-7vtu-p-kartinki-krug-zelenii-na-prozrachnom-fone-13.png',
             mower: 'https://static.wikia.nocookie.net/plantsvs-zombies/images/1/18/Machine.png/revision/latest/scale-to-width-down/250?cb=20200506143358&path-prefix=ru',
-            sun: 'https://cdn-icons-png.flaticon.com/512/2720/2720081.png'
+            sun: 'https://cdn-icons-png.flaticon.com/512/2720/2720081.png',
+            grass1: 'https://fortport.ru/photo/51017',
+            grass2: 'https://fortport.ru/photo/51016'
         };
 
         const AUDIO_FILES = {
@@ -380,6 +365,8 @@
                 this.waveNumber = 1;
                 this.audioManager = new AudioManager();
                 this.ghostPlant = document.getElementById('ghostPlant');
+                this.cellWidth = 0;
+                this.cellHeight = 0;
 
                 this.init();
             }
@@ -409,9 +396,9 @@
                         cell.dataset.col = c;
                         
                         if ((r + c) % 2 === 0) {
-                            cell.style.backgroundImage = "url('https://fortport.ru/photo/51017')";
+                            cell.style.backgroundImage = `url('${IMAGES.grass1}')`;
                         } else {
-                            cell.style.backgroundImage = "url('https://fortport.ru/photo/51016')";
+                            cell.style.backgroundImage = `url('${IMAGES.grass2}')`;
                         }
                         
                         cell.addEventListener('click', (e) => this.onCellClick(e));
@@ -421,6 +408,12 @@
 
                     lawn.appendChild(row);
                 }
+
+                setTimeout(() => {
+                    const firstCell = document.querySelector('.cell');
+                    this.cellWidth = firstCell.getBoundingClientRect().width;
+                    this.cellHeight = firstCell.getBoundingClientRect().height;
+                }, 100);
             }
 
             createMowers() {
@@ -550,8 +543,8 @@
                 sun.src = IMAGES.sun;
                 sun.className = 'sun';
                 const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                const cellWidth = rowElement.children[0].getBoundingClientRect().width;
-                sun.style.left = `${col * (cellWidth + 5) + cellWidth / 2 - 22}px`;
+                const cellWidth = this.cellWidth;
+                sun.style.left = `${col * cellWidth + cellWidth / 2 - 22}px`;
                 sun.style.top = '-50px';
                 
                 rowElement.appendChild(sun);
@@ -566,7 +559,7 @@
                     y += 3;
                     sun.style.top = `${y}px`;
                     
-                    if (y >= 80) {
+                    if (y >= this.cellHeight - 50) {
                         clearInterval(fallInterval);
                         sun.style.cursor = 'pointer';
                         sun.addEventListener('click', () => this.collectSun(sun));
@@ -588,9 +581,9 @@
                 sun.src = IMAGES.sun;
                 sun.className = 'sun';
                 const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                const cellWidth = rowElement.children[0].getBoundingClientRect().width;
-                sun.style.left = `${col * (cellWidth + 5) + cellWidth / 2 - 22}px`;
-                sun.style.top = `${row * (rowElement.getBoundingClientRect().height + 5) + 30}px`;
+                const cellWidth = this.cellWidth;
+                sun.style.left = `${col * cellWidth + cellWidth / 2 - 22}px`;
+                sun.style.top = `${row * this.cellHeight + this.cellHeight / 2 - 22}px`;
                 
                 rowElement.appendChild(sun);
                 this.suns.push(sun);
@@ -627,20 +620,22 @@
                 const zombie = document.createElement('img');
                 zombie.src = IMAGES.zombie;
                 zombie.className = 'zombie';
-                zombie.style.right = '-70px';
-                zombie.style.top = '15px';
-
+                
                 const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                const rowWidth = rowElement.getBoundingClientRect().width;
+                zombie.style.left = `${rowWidth + 50}px`;
+                zombie.style.top = `${this.cellHeight / 2 - 35}px`;
+
                 rowElement.appendChild(zombie);
 
                 const zombieObj = {
                     id: Date.now() + Math.random(),
                     row: row,
-                    x: 0,
+                    x: rowWidth + 50,
                     hp: 200,
                     element: zombie,
                     alive: true,
-                    speed: 0.4,
+                    speed: 0.7,
                     eating: false,
                     damageInterval: null,
                     eatingPlantCol: -1
@@ -662,12 +657,15 @@
                     let hasPlant = false;
                     for (let c = 0; c < this.cols; c++) {
                         if (this.plants[zombie.row][c]) {
-                            const rowElement = document.querySelector(`.row[data-row="${zombie.row}"]`);
-                            const cellWidth = rowElement.children[0].getBoundingClientRect().width;
-                            const plantX = c * (cellWidth + 5);
-                            const zombieX = zombie.x + 65;
+                            const plantX = c * this.cellWidth;
+                            const zombieHitbox = {
+                                left: zombie.x,
+                                right: zombie.x + 50,
+                                top: 20,
+                                bottom: 60
+                            };
                             
-                            if (zombie.x < plantX + cellWidth && zombieX > plantX) {
+                            if (zombieHitbox.right > plantX && zombieHitbox.left < plantX + this.cellWidth) {
                                 hasPlant = true;
                                 if (!zombie.eating) {
                                     zombie.eating = true;
@@ -687,11 +685,11 @@
                                 clearInterval(zombie.damageInterval);
                             }
                         }
-                        zombie.x += zombie.speed;
-                        zombie.element.style.right = `${zombie.x}px`;
+                        zombie.x -= zombie.speed;
+                        zombie.element.style.left = `${zombie.x}px`;
                     }
 
-                    if (zombie.x > window.innerWidth - 100) {
+                    if (zombie.x < 60) {
                         this.activateMower(zombie.row);
                         zombie.alive = false;
                         zombie.element.remove();
@@ -701,7 +699,7 @@
                         }
                         clearInterval(interval);
                     }
-                }, 100);
+                }, 50);
                 this.intervals.push(interval);
             }
 
@@ -717,10 +715,8 @@
                     }
                     
                     if (this.plants[zombie.row][plantCol]) {
-                        // Воспроизводим звук поедания при каждом укусе
                         this.audioManager.playChomp();
                         
-                        // Уменьшаем здоровье растения
                         const plant = this.plants[zombie.row][plantCol];
                         plant.hp -= 25;
                         
@@ -759,8 +755,7 @@
 
                     this.zombies.forEach(zombie => {
                         if (zombie.row === row && zombie.alive) {
-                            const zombieX = zombie.x;
-                            if (x > zombieX - 30 && x < zombieX + 30) {
+                            if (Math.abs(x - zombie.x) < 40) {
                                 zombie.alive = false;
                                 zombie.element.remove();
                                 if (zombie.damageInterval) {
@@ -785,16 +780,15 @@
                 const projectile = document.createElement('img');
                 projectile.src = IMAGES.projectile;
                 projectile.className = 'projectile';
-                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                const cellWidth = rowElement.children[0].getBoundingClientRect().width;
-                projectile.style.left = `${col * (cellWidth + 5) + cellWidth / 2}px`;
-                projectile.style.top = '30px';
+                projectile.style.left = `${col * this.cellWidth + this.cellWidth / 2}px`;
+                projectile.style.top = `${this.cellHeight / 2 - 15}px`;
 
+                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
                 rowElement.appendChild(projectile);
 
                 const projectileObj = {
                     row: row,
-                    x: col * (cellWidth + 5) + cellWidth / 2,
+                    x: col * this.cellWidth + this.cellWidth / 2,
                     element: projectile,
                     active: true
                 };
@@ -807,19 +801,15 @@
                         return;
                     }
 
-                    projectileObj.x += 15;
+                    projectileObj.x += 5;
                     projectileObj.element.style.left = `${projectileObj.x}px`;
 
                     this.zombies.forEach(zombie => {
                         if (zombie.row === row && zombie.alive) {
-                            const zombieLeft = zombie.x;
-                            const zombieRight = zombie.x + 65;
-                            
-                            if (projectileObj.x >= zombieLeft && projectileObj.x <= zombieRight) {
+                            if (Math.abs(projectileObj.x - zombie.x) < 30) {
                                 zombie.hp -= 20;
                                 projectileObj.active = false;
                                 projectileObj.element.remove();
-                                // Звук удара при попадании
                                 this.audioManager.playSound('hit');
                                 
                                 if (zombie.hp <= 0) {
@@ -877,14 +867,14 @@
                 this.gameRunning = true;
                 
                 const zombieInterval = setInterval(() => {
-                    if (this.gameRunning) {
+                    if (this.gameRunning && this.zombies.length < 5) {
                         this.spawnZombie();
                         
                         if (this.zombieCounter % 10 === 0) {
                             this.waveNumber++;
                         }
                     }
-                }, 3000);
+                }, 5000);
                 this.intervals.push(zombieInterval);
 
                 const sunInterval = setInterval(() => {
@@ -905,39 +895,8 @@
                     if (this.gameRunning) {
                         this.spawnZombie();
                     }
-                }, 5000);
+                }, 8000);
                 this.timeouts.push(firstZombie);
-            }
-
-            restartGame() {
-                this.gameRunning = false;
-                
-                this.intervals.forEach(interval => clearInterval(interval));
-                this.timeouts.forEach(timeout => clearTimeout(timeout));
-                this.intervals = [];
-                this.timeouts = [];
-
-                this.zombies.forEach(zombie => {
-                    if (zombie.damageInterval) clearInterval(zombie.damageInterval);
-                    zombie.element.remove();
-                });
-                this.projectiles.forEach(projectile => projectile.element.remove());
-                this.suns.forEach(sun => sun.remove());
-                
-                this.zombies = [];
-                this.projectiles = [];
-                this.suns = [];
-                this.plants = [];
-                this.sunCount = 150;
-                this.selectedPlant = null;
-                this.zombieCounter = 0;
-                this.waveNumber = 1;
-                this.ghostPlant.style.display = 'none';
-
-                this.createLawn();
-                this.createMowers();
-                this.updateSunDisplay();
-                this.startGame();
             }
         }
 
