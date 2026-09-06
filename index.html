@@ -1,752 +1,934 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.8">
-  <title>Степаша</title>
-  <style>
-    body {
-      background: #000;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 10px;
-    }
-    .box {
-      padding: 20px;
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
-      color: #eee;
-    }
-    .gif {
-      width: 180px;
-      height: 180px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .phrase {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin: 8px 0 12px;
-      background: #111;
-      padding: 8px;
-    }
-    .game-select {
-      display: flex;
-      gap: 4px;
-      justify-content: center;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-    .game-select button {
-      background: #222;
-      color: #ccc;
-      border: 1px solid #444;
-      padding: 5px 10px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-    .game-select button.active {
-      background: #444;
-      color: #fff;
-      border-color: #888;
-    }
-    .settings-row {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-      font-size: 0.75rem;
-    }
-    .settings-row select {
-      background: #222;
-      color: #ccc;
-      border: 1px solid #444;
-      padding: 3px 6px;
-      font-size: 0.75rem;
-    }
-    .settings-row label {
-      color: #aaa;
-    }
-    .btns {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-    .btns button {
-      width: 65px;
-      height: 65px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      padding: 5px;
-    }
-    .btns button img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .tictactoe {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 3px;
-      margin-bottom: 10px;
-    }
-    .tictactoe button {
-      aspect-ratio: 1;
-      background: #111;
-      border: 1px solid #333;
-      color: #fff;
-      font-size: 1.8rem;
-      cursor: pointer;
-    }
-    .checkers-board {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 0;
-      margin-bottom: 10px;
-      border: 2px solid #555;
-    }
-    .checkers-board button {
-      aspect-ratio: 1;
-      cursor: pointer;
-      border: none;
-      padding: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.2rem;
-      position: relative;
-    }
-    .white-cell { background: #fff; }
-    .black-cell { background: #222; }
-    .selected { box-shadow: inset 0 0 0 3px #ffeb3b; }
-    .capture-hint { box-shadow: inset 0 0 0 3px #00ff00; }
-    .piece-img {
-      width: 90%;
-      height: 90%;
-      object-fit: contain;
-    }
-    .timer-bar {
-      width: 100%;
-      height: 4px;
-      background: #333;
-      margin-bottom: 6px;
-    }
-    .timer-fill {
-      height: 100%;
-      background: #ffeb3b;
-      transition: width 0.1s linear;
-    }
-    .chat {
-      background: #111;
-      padding: 10px;
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-    }
-    .reset {
-      background: #222;
-      color: #ccc;
-      border: 1px solid #444;
-      padding: 6px 18px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Plants vs Zombies - Дневная Лужайка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 50%, #1a3e1f 50%, #2d5a2a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 1100px;
+            max-width: 98vw;
+            background: #5b8c4e;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #c4a26b;
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 3px solid #7a5c3a;
+            margin-bottom: 15px;
+        }
+
+        .sun-counter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #e9dbbd;
+            padding: 5px 20px;
+            border-radius: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #3b2a0e;
+            border: 3px solid #aa8b55;
+        }
+
+        .sun-counter img {
+            width: 35px;
+            height: 35px;
+        }
+
+        .seed-bank {
+            display: flex;
+            gap: 10px;
+        }
+
+        .seed {
+            width: 80px;
+            height: 80px;
+            background: #e7d6b5;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid #4f3a1e;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .seed:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .seed.selected {
+            border: 4px solid #ffeb3b;
+            box-shadow: 0 0 20px rgba(255,235,59,0.8);
+            transform: translateY(-3px);
+        }
+
+        .seed.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+        }
+
+        .seed img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .seed .cost {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2b1c09;
+            background: #fcf3da;
+            padding: 2px 10px;
+            border-radius: 10px;
+            margin-top: 2px;
+        }
+
+        .lawn-container {
+            position: relative;
+            background: #6da554;
+            border-radius: 15px;
+            padding: 10px;
+            border: 4px solid #3e6b2c;
+            overflow: hidden;
+        }
+
+        .lawn {
+            display: grid;
+            grid-template-rows: repeat(5, 1fr);
+            gap: 5px;
+            position: relative;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 5px;
+            position: relative;
+            min-height: 95px;
+            border-radius: 3px;
+        }
+
+        .cell {
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            min-height: 95px;
+            transition: all 0.2s;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .cell:hover {
+            filter: brightness(1.3);
+            transform: scale(1.03);
+            z-index: 1;
+        }
+
+        .cell.occupied {
+            cursor: not-allowed;
+            filter: none;
+            transform: none;
+        }
+
+        .plant {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            position: absolute;
+            z-index: 5;
+            pointer-events: none;
+            animation: plantIn 0.4s ease-out;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
+        }
+
+        @keyframes plantIn {
+            from {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .zombie {
+            position: absolute;
+            width: 65px;
+            height: 75px;
+            object-fit: contain;
+            z-index: 7;
+            pointer-events: none;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
+            transition: right 0.05s linear;
+        }
+
+        .projectile {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            z-index: 6;
+            pointer-events: none;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+
+        .mower {
+            position: absolute;
+            width: 75px;
+            height: 65px;
+            object-fit: contain;
+            z-index: 9;
+            pointer-events: none;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
+            left: -15px;
+            bottom: 10px;
+            transition: left 0.1s linear;
+        }
+
+        .sun {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            z-index: 12;
+            cursor: pointer;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
+            animation: floatSun 2s infinite ease-in-out;
+            pointer-events: auto;
+            transition: transform 0.2s;
+        }
+
+        .sun:hover {
+            transform: scale(1.2);
+            animation: none;
+        }
+
+        @keyframes floatSun {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #4a3e2c;
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 3px solid #b48b4c;
+            margin-top: 15px;
+            color: #fbeab3;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .restart-btn {
+            background: #e6b422;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #9e7a1a;
+            transition: all 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #9e7a1a;
+        }
+
+        .restart-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #9e7a1a;
+        }
+    </style>
 </head>
 <body>
-  <div class="box">
-    <img class="gif" id="gif" src="https://theblueprint.ru/upload/10286m/vms/eab27402cc3bb03d766824c3b6cdbd90.gif" alt="Степаша">
-    <div class="phrase" id="phrase">бурмалда</div>
+    <div class="game-container">
+        <!-- Верхняя панель -->
+        <div class="top-bar">
+            <div class="sun-counter">
+                <img src="https://cdn-icons-png.flaticon.com/512/2720/2720081.png" alt="Солнце">
+                <span id="sunCount">150</span>
+            </div>
+            <div class="seed-bank">
+                <div class="seed" id="seedSunflower" title="Подсолнух - 50 солнца">
+                    <img src="https://fortport.ru/photo/55463" alt="Подсолнух">
+                    <span class="cost">50</span>
+                </div>
+                <div class="seed" id="seedPeashooter" title="Горохострел - 100 солнца">
+                    <img src="https://fortport.ru/photo/55462" alt="Горохострел">
+                    <span class="cost">100</span>
+                </div>
+            </div>
+        </div>
 
-    <div class="game-select">
-      <button id="gameRps" class="active">камень ножницы</button>
-      <button id="gameTtt">крестики нолики</button>
-      <button id="gameCheckers">шашки</button>
+        <!-- Газон -->
+        <div class="lawn-container">
+            <div class="lawn" id="lawn"></div>
+        </div>
+
+        <!-- Нижняя панель -->
+        <div class="bottom-bar">
+            <span>☀️ Дневная Лужайка - Уровень 1</span>
+            <button class="restart-btn" id="restartBtn">🌱 Перезапуск</button>
+        </div>
     </div>
 
-    <div class="settings-row" id="checkersSettings" style="display:none;">
-      <label>сложность:</label>
-      <select id="difficultySelect">
-        <option value="easy">легко</option>
-        <option value="medium" selected>средне</option>
-        <option value="hard">сложно</option>
-      </select>
-      <label>цвет:</label>
-      <select id="colorSelect">
-        <option value="white">белые</option>
-        <option value="black">чёрные</option>
-      </select>
-    </div>
+    <script>
+        const IMAGES = {
+            sunflower: 'https://fortport.ru/photo/55463',
+            peashooter: 'https://fortport.ru/photo/55462',
+            zombie: 'https://fortport.ru/photo/4059',
+            projectile: 'https://foni.papik.pro/uploads/posts/2024-09/foni-papik-pro-7vtu-p-kartinki-krug-zelenii-na-prozrachnom-fone-13.png',
+            mower: 'https://static.wikia.nocookie.net/plantsvs-zombies/images/1/18/Machine.png/revision/latest/scale-to-width-down/250?cb=20200506143358&path-prefix=ru',
+            sun: 'https://cdn-icons-png.flaticon.com/512/2720/2720081.png'
+        };
 
-    <div id="rpsArea">
-      <div class="btns">
-        <button id="rock"><img src="https://img.magnific.com/premium-photo/natural-gray-rock-isolated-white_53876-1429553.jpg?semt=ais_test_b&w=740&q=80" alt="камень"></button>
-        <button id="scissors"><img src="https://pngicon.ru/file/uploads/nozhnicy.png" alt="ножницы"></button>
-        <button id="paper"><img src="https://bakerstore.ru/image/cache/catalog/PH/3876221-600x600.png" alt="бумага"></button>
-      </div>
-    </div>
+        // Аудио файлы (будут загружены с GitHub)
+        const AUDIO = {
+            background: 'plants_vs_zombies_04 - Grasswalk.mp3',
+            sunPickup: 'plants-vs-zombies-sun-pickup.mp3',
+            seedPacket: 'plants-vs-zombies-seed-packet-sound.mp3',
+            planting: 'plants-vs-zombies-planting-sound.mp3',
+            hit: 'plants-vs-zombies-hit.mp3',
+            chomp: 'chomp.mp3',
+            chomp2: 'chomp2.mp3'
+        };
 
-    <div id="tttArea" style="display:none;">
-      <div class="tictactoe" id="board"></div>
-    </div>
-
-    <div id="checkersArea" style="display:none;">
-      <div class="timer-bar" id="timerBar" style="display:none;">
-        <div class="timer-fill" id="timerFill" style="width:100%;"></div>
-      </div>
-      <div class="checkers-board" id="checkersBoard"></div>
-    </div>
-
-    <div class="chat">
-      <div id="botSay">Степаша: жду</div>
-      <div id="result">сделай выбор</div>
-    </div>
-    <button class="reset" id="reset">заново</button>
-  </div>
-
-  <script>
-    const gif = document.getElementById('gif');
-    const phrase = document.getElementById('phrase');
-    const botSay = document.getElementById('botSay');
-    const result = document.getElementById('result');
-    const resetBtn = document.getElementById('reset');
-
-    const gameRps = document.getElementById('gameRps');
-    const gameTtt = document.getElementById('gameTtt');
-    const gameCheckers = document.getElementById('gameCheckers');
-    const rpsArea = document.getElementById('rpsArea');
-    const tttArea = document.getElementById('tttArea');
-    const checkersArea = document.getElementById('checkersArea');
-    const checkersSettings = document.getElementById('checkersSettings');
-    const difficultySelect = document.getElementById('difficultySelect');
-    const colorSelect = document.getElementById('colorSelect');
-    const board = document.getElementById('board');
-    const checkersBoard = document.getElementById('checkersBoard');
-    const timerBar = document.getElementById('timerBar');
-    const timerFill = document.getElementById('timerFill');
-
-    let currentGame = 'rps';
-    let tttBoard = ['','','','','','','','',''];
-    let tttActive = true;
-    let tttMistakeChance = 0.15;
-
-    let checkersPos = null;
-    let checkersSelected = null;
-    let checkersTurn = 'white';
-    let playerColor = 'white';
-    let botColor = 'black';
-    let checkersGameOver = false;
-    let chainCaptures = [];
-    let chainTimer = null;
-    let difficulty = 'medium';
-
-    const WHITE_PIECE_IMG = 'https://avatanplus.com/files/resources/original/5f394193cd6b2173f7a82981.png';
-
-    function updateColors() {
-      playerColor = colorSelect.value;
-      botColor = playerColor === 'white' ? 'black' : 'white';
-    }
-
-    // ========== КРЕСТИКИ-НОЛИКИ ==========
-    function tttMinimax(b, isMax) {
-      const winner = checkTttWin(b);
-      if (winner === 'X') return -10;
-      if (winner === 'O') return 10;
-      if (!b.includes('')) return 0;
-      if (isMax) {
-        let best = -999;
-        for (let i=0; i<9; i++) {
-          if (b[i] === '') { b[i] = 'O'; best = Math.max(best, tttMinimax(b, false)); b[i] = ''; }
-        }
-        return best;
-      } else {
-        let best = 999;
-        for (let i=0; i<9; i++) {
-          if (b[i] === '') { b[i] = 'X'; best = Math.min(best, tttMinimax(b, true)); b[i] = ''; }
-        }
-        return best;
-      }
-    }
-
-    function findBestTttMove() {
-      let bestScore = -999;
-      let bestMove = -1;
-      const emptyCells = [];
-      for (let i=0; i<9; i++) {
-        if (tttBoard[i] === '') {
-          emptyCells.push(i);
-          tttBoard[i] = 'O';
-          const score = tttMinimax(tttBoard, false);
-          tttBoard[i] = '';
-          if (score > bestScore) { bestScore = score; bestMove = i; }
-        }
-      }
-      if (Math.random() < tttMistakeChance && emptyCells.length > 1) {
-        const badMoves = emptyCells.filter(i => i !== bestMove);
-        if (badMoves.length > 0) return badMoves[Math.floor(Math.random() * badMoves.length)];
-      }
-      return bestMove;
-    }
-
-    function checkTttWin(b) {
-      const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-      for (const [a,b_,c] of wins) if (b[a] && b[a]===b[b_] && b[a]===b[c]) return b[a];
-      return b.includes('') ? null : 'ничья';
-    }
-
-    function renderTtt() {
-      board.innerHTML = '';
-      tttBoard.forEach((cell, i) => {
-        const btn = document.createElement('button');
-        btn.textContent = cell;
-        btn.onclick = () => tttPlayerMove(i);
-        board.appendChild(btn);
-      });
-    }
-
-    function tttPlayerMove(i) {
-      if (!tttActive || tttBoard[i] !== '') return;
-      tttBoard[i] = 'X';
-      renderTtt();
-      const winner = checkTttWin(tttBoard);
-      if (winner) {
-        tttActive = false;
-        if (winner==='X') { result.textContent='ты победил'; phrase.textContent='повезло...'; botSay.textContent='Степаша: ...'; }
-        else { result.textContent='ничья'; phrase.textContent='ничья'; botSay.textContent='Степаша: ничья'; }
-        return;
-      }
-      if (!tttBoard.includes('')) {
-        tttActive = false;
-        result.textContent='ничья'; phrase.textContent='ничья'; botSay.textContent='Степаша: ничья';
-        return;
-      }
-      setTimeout(() => {
-        if (!tttActive) return;
-        const botMove = findBestTttMove();
-        if (botMove >= 0) {
-          tttBoard[botMove] = 'O';
-          renderTtt();
-          botSay.textContent = 'Степаша: я сходил';
-          const w = checkTttWin(tttBoard);
-          if (w) {
-            tttActive = false;
-            if (w==='O') { result.textContent='Степаша победил'; phrase.textContent='бурмалда!'; }
-            else { result.textContent='ничья'; phrase.textContent='ничья'; }
-          } else if (!tttBoard.includes('')) {
-            tttActive = false;
-            result.textContent='ничья'; phrase.textContent='ничья';
-          }
-        }
-      }, 300);
-    }
-
-    // ========== ШАШКИ ==========
-    function createCheckersPosition() {
-      const pos = [];
-      for (let r=0; r<8; r++) {
-        pos[r] = [];
-        for (let c=0; c<8; c++) {
-          if ((r+c)%2 === 1) {
-            if (r<3) pos[r][c] = 'b';
-            else if (r>4) pos[r][c] = 'w';
-            else pos[r][c] = '';
-          } else pos[r][c] = '';
-        }
-      }
-      return pos;
-    }
-
-    function cloneCheckers(pos) { return pos.map(row => [...row]); }
-
-    function getCapturesOnly(pos, row, col) {
-      const piece = pos[row][col];
-      if (!piece) return [];
-      const isWhite = piece === 'w' || piece === 'W';
-      const isKing = piece === 'W' || piece === 'B';
-      const captures = [];
-      if (isKing) {
-        [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc]) => {
-          for (let i=1; i<8; i++) {
-            const r=row+dr*i, c=col+dc*i;
-            if (r<0||r>=8||c<0||c>=8) break;
-            if (pos[r][c]) {
-              const tw = pos[r][c]==='w'||pos[r][c]==='W';
-              if (isWhite !== tw) {
-                const r2=r+dr, c2=c+dc;
-                if (r2>=0&&r2<8&&c2>=0&&c2<8&&!pos[r2][c2]) captures.push({row:r2,col:c2,captures:[{row:r,col:c}]});
-              }
-              break;
+        class AudioManager {
+            constructor() {
+                this.sounds = {};
+                this.backgroundMusic = null;
+                this.initAudio();
             }
-          }
-        });
-      } else {
-        [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc]) => {
-          const r1=row+dr, c1=col+dc;
-          if (r1>=0&&r1<8&&c1>=0&&c1<8&&pos[r1][c1]) {
-            const tw = pos[r1][c1]==='w'||pos[r1][c1]==='W';
-            if (isWhite !== tw) {
-              const r2=r1+dr, c2=c1+dc;
-              if (r2>=0&&r2<8&&c2>=0&&c2<8&&!pos[r2][c2]) captures.push({row:r2,col:c2,captures:[{row:r1,col:c1}]});
+
+            initAudio() {
+                // Загружаем все звуки
+                for (const [key, file] of Object.entries(AUDIO)) {
+                    const audio = new Audio(file);
+                    audio.preload = 'auto';
+                    this.sounds[key] = audio;
+                }
+
+                // Настраиваем фоновую музыку
+                this.backgroundMusic = this.sounds.background;
+                this.backgroundMusic.loop = true;
+                this.backgroundMusic.volume = 0.3;
             }
-          }
-        });
-      }
-      return captures;
-    }
 
-    function getCheckersMoves(pos, row, col) {
-      const piece = pos[row][col];
-      if (!piece) return [];
-      const isWhite = piece === 'w' || piece === 'W';
-      const isKing = piece === 'W' || piece === 'B';
-      const captures = getCapturesOnly(pos, row, col);
-      if (captures.length > 0) return captures;
-      const moves = [];
-      if (isKing) {
-        [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc]) => {
-          for (let i=1; i<8; i++) {
-            const r=row+dr*i, c=col+dc*i;
-            if (r<0||r>=8||c<0||c>=8) break;
-            if (!pos[r][c]) moves.push({row:r,col:c,captures:[]});
-            else break;
-          }
-        });
-      } else {
-        const forward = isWhite ? -1 : 1;
-        [[forward,-1],[forward,1]].forEach(([dr,dc]) => {
-          const r=row+dr, c=col+dc;
-          if (r>=0&&r<8&&c>=0&&c<8&&!pos[r][c]) moves.push({row:r,col:c,captures:[]});
-        });
-      }
-      return moves;
-    }
-
-    function getAllCheckersMoves(pos, isWhite) {
-      const allMoves = [];
-      let hasCaptures = false;
-      for (let r=0; r<8; r++) {
-        for (let c=0; c<8; c++) {
-          const piece = pos[r][c];
-          if (!piece) continue;
-          if ((piece==='w'||piece==='W') !== isWhite) continue;
-          const moves = getCheckersMoves(pos, r, c);
-          moves.forEach(m => {
-            if (m.captures && m.captures.length>0) { hasCaptures = true; allMoves.push({fromRow:r,fromCol:c,toRow:m.row,toCol:m.col,captures:m.captures}); }
-          });
-        }
-      }
-      if (hasCaptures) return allMoves;
-      for (let r=0; r<8; r++) {
-        for (let c=0; c<8; c++) {
-          const piece = pos[r][c];
-          if (!piece) continue;
-          if ((piece==='w'||piece==='W') !== isWhite) continue;
-          const moves = getCheckersMoves(pos, r, c);
-          moves.forEach(m => {
-            if (!m.captures || m.captures.length===0) allMoves.push({fromRow:r,fromCol:c,toRow:m.row,toCol:m.col,captures:[]});
-          });
-        }
-      }
-      return allMoves;
-    }
-
-    function makeCheckersMove(pos, move) {
-      const newPos = cloneCheckers(pos);
-      const piece = newPos[move.fromRow][move.fromCol];
-      newPos[move.toRow][move.toCol] = piece;
-      newPos[move.fromRow][move.fromCol] = '';
-      move.captures.forEach(cap => { newPos[cap.row][cap.col] = ''; });
-      if (piece==='w' && move.toRow===0) newPos[move.toRow][move.toCol] = 'W';
-      if (piece==='b' && move.toRow===7) newPos[move.toRow][move.toCol] = 'B';
-      return newPos;
-    }
-
-    function hasMoreCaptures(pos, row, col) { return getCapturesOnly(pos, row, col).length > 0; }
-
-    function evaluateCheckers(pos) {
-      let score = 0;
-      for (let r=0; r<8; r++) for (let c=0; c<8; c++) {
-        const p = pos[r][c];
-        if (p==='w') score += 10;
-        if (p==='W') score += 30;
-        if (p==='b') score -= 10;
-        if (p==='B') score -= 30;
-      }
-      return score;
-    }
-
-    function minimaxCheckers(pos, depth, isMaximizing, alpha, beta) {
-      if (depth === 0) return evaluateCheckers(pos);
-      const moves = getAllCheckersMoves(pos, isMaximizing);
-      if (moves.length === 0) return isMaximizing ? -9999 : 9999;
-      if (isMaximizing) {
-        let best = -99999;
-        for (const move of moves) {
-          const np = makeCheckersMove(pos, move);
-          best = Math.max(best, minimaxCheckers(np, depth-1, false, alpha, beta));
-          alpha = Math.max(alpha, best);
-          if (beta <= alpha) break;
-        }
-        return best;
-      } else {
-        let best = 99999;
-        for (const move of moves) {
-          const np = makeCheckersMove(pos, move);
-          best = Math.min(best, minimaxCheckers(np, depth-1, true, alpha, beta));
-          beta = Math.min(beta, best);
-          if (beta <= alpha) break;
-        }
-        return best;
-      }
-    }
-
-    function findBestCheckersMove(pos) {
-      const botIsWhite = botColor === 'white';
-      const moves = getAllCheckersMoves(pos, botIsWhite);
-      if (moves.length === 0) return null;
-      
-      let depth;
-      if (difficulty === 'easy') depth = 1;
-      else if (difficulty === 'medium') depth = 3;
-      else depth = 5;
-      
-      let bestMove = moves[0];
-      let bestScore = botIsWhite ? -99999 : 99999;
-      
-      for (const move of moves) {
-        const np = makeCheckersMove(pos, move);
-        const score = minimaxCheckers(np, depth-1, !botIsWhite, -99999, 99999);
-        if (botIsWhite) {
-          if (score > bestScore) { bestScore = score; bestMove = move; }
-        } else {
-          if (score < bestScore) { bestScore = score; bestMove = move; }
-        }
-      }
-      
-      if (difficulty === 'easy' && Math.random() < 0.3 && moves.length > 1) {
-        return moves[Math.floor(Math.random() * moves.length)];
-      }
-      
-      return bestMove;
-    }
-
-    function botMove() {
-      if (checkersGameOver) return;
-      const botMoveResult = findBestCheckersMove(checkersPos);
-      if (botMoveResult) {
-        checkersPos = makeCheckersMove(checkersPos, botMoveResult);
-        botSay.textContent = 'Степаша: я сходил';
-      }
-      checkersTurn = playerColor;
-      renderCheckersBoard();
-      
-      const playerIsWhite = playerColor === 'white';
-      const playerMoves = getAllCheckersMoves(checkersPos, playerIsWhite);
-      if (playerMoves.length === 0) {
-        checkersGameOver = true;
-        result.textContent = 'Степаша победил';
-        phrase.textContent = 'бурмалда!';
-      }
-    }
-
-    function startChainTimer() {
-      clearTimeout(chainTimer);
-      chainTimer = setTimeout(() => {
-        timerBar.style.display = 'none';
-        finishChain();
-      }, 4000);
-      timerBar.style.display = 'block';
-      timerFill.style.width = '100%';
-      setTimeout(() => { if (timerBar.style.display !== 'none') timerFill.style.width = '0%'; }, 100);
-    }
-
-    function finishChain() {
-      clearTimeout(chainTimer);
-      timerBar.style.display = 'none';
-      chainCaptures = [];
-      checkersTurn = playerColor === 'white' ? 'black' : 'white';
-      renderCheckersBoard();
-      if (checkersTurn !== playerColor) {
-        setTimeout(botMove, 200);
-      }
-    }
-
-    function renderCheckersBoard() {
-      checkersBoard.innerHTML = '';
-      for (let r=0; r<8; r++) {
-        for (let c=0; c<8; c++) {
-          const btn = document.createElement('button');
-          btn.className = (r+c)%2 === 0 ? 'white-cell' : 'black-cell';
-          const piece = checkersPos[r][c];
-          btn.innerHTML = '';
-          if (piece) {
-            const img = document.createElement('img');
-            img.src = WHITE_PIECE_IMG;
-            img.className = 'piece-img';
-            if (piece === 'w' || piece === 'W') {
-              img.style.filter = 'none';
-              btn.appendChild(img);
-              if (piece === 'W') {
-                const l = document.createElement('span');
-                l.textContent = 'Д'; l.style.position='absolute'; l.style.fontSize='0.7rem'; l.style.color='#000'; l.style.fontWeight='bold'; l.style.pointerEvents='none';
-                btn.appendChild(l);
-              }
-            } else {
-              img.style.filter = 'invert(1)';
-              btn.appendChild(img);
-              if (piece === 'B') {
-                const l = document.createElement('span');
-                l.textContent = 'Д'; l.style.position='absolute'; l.style.fontSize='0.7rem'; l.style.color='#fff'; l.style.fontWeight='bold'; l.style.pointerEvents='none';
-                btn.appendChild(l);
-              }
+            playBackground() {
+                this.backgroundMusic.play().catch(() => {
+                    // Автовоспроизведение может быть заблокировано
+                    document.addEventListener('click', () => {
+                        this.backgroundMusic.play();
+                    }, { once: true });
+                });
             }
-          }
-          if (chainCaptures.length > 0) {
-            const lp = chainCaptures[chainCaptures.length-1];
-            if (getCapturesOnly(checkersPos, lp.row, lp.col).find(m => m.row===r && m.col===c)) btn.classList.add('capture-hint');
-          }
-          if (checkersSelected && checkersSelected.row===r && checkersSelected.col===c) btn.classList.add('selected');
-          btn.onclick = () => checkersClick(r, c);
-          checkersBoard.appendChild(btn);
-        }
-      }
-    }
 
-    function checkersClick(row, col) {
-      if (checkersGameOver || checkersTurn !== playerColor) return;
-      const isPlayerWhite = playerColor === 'white';
-      
-      if (chainCaptures.length > 0) {
-        const lp = chainCaptures[chainCaptures.length-1];
-        const captures = getCapturesOnly(checkersPos, lp.row, lp.col);
-        const valid = captures.find(m => m.row===row && m.col===col);
-        if (valid) {
-          checkersPos = makeCheckersMove(checkersPos, {fromRow:lp.row, fromCol:lp.col, toRow:row, toCol:col, captures:valid.captures||[]});
-          chainCaptures.push({row, col});
-          if (hasMoreCaptures(checkersPos, row, col)) {
-            clearTimeout(chainTimer);
-            startChainTimer();
-            checkersSelected = null;
-            renderCheckersBoard();
-          } else {
-            clearTimeout(chainTimer);
-            timerBar.style.display = 'none';
-            chainCaptures = [];
-            checkersTurn = botColor;
-            checkersSelected = null;
-            renderCheckersBoard();
-            if (checkersTurn !== playerColor) setTimeout(botMove, 200);
-          }
-        }
-        return;
-      }
-      
-      if (checkersSelected) {
-        const piece = checkersPos[checkersSelected.row][checkersSelected.col];
-        if (piece && (piece==='w'||piece==='W') === isPlayerWhite) {
-          const moves = getCheckersMoves(checkersPos, checkersSelected.row, checkersSelected.col);
-          const valid = moves.find(m => m.row===row && m.col===col);
-          if (valid) {
-            checkersPos = makeCheckersMove(checkersPos, {fromRow:checkersSelected.row, fromCol:checkersSelected.col, toRow:row, toCol:col, captures:valid.captures||[]});
-            if (valid.captures && valid.captures.length>0 && hasMoreCaptures(checkersPos, row, col)) {
-              chainCaptures = [{row, col}];
-              startChainTimer();
-              checkersSelected = null;
-              renderCheckersBoard();
-              return;
+            playSound(soundKey) {
+                const sound = this.sounds[soundKey];
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.play().catch(() => {});
+                }
             }
-            checkersSelected = null;
-            checkersTurn = botColor;
-            renderCheckersBoard();
-            if (checkersTurn !== playerColor) setTimeout(botMove, 200);
-            return;
-          }
+
+            playChomp() {
+                const sounds = [this.sounds.chomp, this.sounds.chomp2];
+                const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+                if (randomSound) {
+                    randomSound.currentTime = 0;
+                    randomSound.play().catch(() => {});
+                }
+            }
         }
-        checkersSelected = null;
-      }
-      
-      const piece = checkersPos[row][col];
-      if (piece && (piece==='w'||piece==='W') === isPlayerWhite) checkersSelected = {row, col};
-      renderCheckersBoard();
-    }
 
-    function switchGame(game) {
-      currentGame = game;
-      gameRps.classList.toggle('active', game==='rps');
-      gameTtt.classList.toggle('active', game==='ttt');
-      gameCheckers.classList.toggle('active', game==='checkers');
-      rpsArea.style.display = game==='rps' ? 'block' : 'none';
-      tttArea.style.display = game==='ttt' ? 'block' : 'none';
-      checkersArea.style.display = game==='checkers' ? 'block' : 'none';
-      checkersSettings.style.display = game==='checkers' ? 'flex' : 'none';
-      clearTimeout(chainTimer);
-      timerBar.style.display = 'none';
-      resetAll();
-    }
+        class Game {
+            constructor() {
+                this.sunCount = 150;
+                this.selectedPlant = null;
+                this.gameRunning = true;
+                this.rows = 5;
+                this.cols = 9;
+                this.plants = [];
+                this.zombies = [];
+                this.projectiles = [];
+                this.mowers = [];
+                this.suns = [];
+                this.intervals = [];
+                this.timeouts = [];
+                this.zombieCounter = 0;
+                this.waveNumber = 1;
+                this.audioManager = new AudioManager();
 
-    gameRps.onclick = () => switchGame('rps');
-    gameTtt.onclick = () => switchGame('ttt');
-    gameCheckers.onclick = () => switchGame('checkers');
-    difficultySelect.onchange = () => { difficulty = difficultySelect.value; resetAll(); };
-    colorSelect.onchange = () => { updateColors(); resetAll(); };
+                this.init();
+            }
 
-    function playRps(player) {
-      const moves = ['камень','ножницы','бумага'];
-      const bot = moves[Math.floor(Math.random()*3)];
-      botSay.textContent = 'Степаша: я выбрал ' + bot;
-      if (player === bot) { result.textContent = 'ничья'; phrase.textContent = 'ничья'; }
-      else if ((player==='камень'&&bot==='ножницы')||(player==='ножницы'&&bot==='бумага')||(player==='бумага'&&bot==='камень')) { result.textContent = 'ты победил'; phrase.textContent = 'повезло...'; }
-      else { result.textContent = 'Степаша победил'; phrase.textContent = 'бурмалда!'; }
-    }
+            init() {
+                this.createLawn();
+                this.createMowers();
+                this.bindEvents();
+                this.startGame();
+                this.audioManager.playBackground();
+            }
 
-    gif.onclick = () => { phrase.textContent = 'бурмалда'; };
-    document.getElementById('rock').onclick = () => playRps('камень');
-    document.getElementById('scissors').onclick = () => playRps('ножницы');
-    document.getElementById('paper').onclick = () => playRps('бумага');
+            createLawn() {
+                const lawn = document.getElementById('lawn');
+                lawn.innerHTML = '';
 
-    function resetAll() {
-      clearTimeout(chainTimer);
-      timerBar.style.display = 'none';
-      chainCaptures = [];
-      updateColors();
-      if (currentGame === 'rps') {
-        botSay.textContent = 'Степаша: жду'; result.textContent = 'сделай выбор'; phrase.textContent = 'бурмалда';
-      } else if (currentGame === 'ttt') {
-        tttBoard = ['','','','','','','','',''];
-        tttActive = true;
-        renderTtt();
-        botSay.textContent = 'Степаша: твой ход'; result.textContent = 'крестики нолики'; phrase.textContent = 'бурмалда';
-      } else if (currentGame === 'checkers') {
-        difficulty = difficultySelect.value;
-        checkersPos = createCheckersPosition();
-        checkersSelected = null;
-        checkersTurn = 'white';
-        checkersGameOver = false;
-        renderCheckersBoard();
-        if (playerColor === 'white') {
-          botSay.textContent = 'Степаша: твой ход (белые)';
-        } else {
-          botSay.textContent = 'Степаша: я хожу (белые)';
-          setTimeout(botMove, 500);
+                for (let r = 0; r < this.rows; r++) {
+                    this.plants[r] = [];
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    row.dataset.row = r;
+
+                    for (let c = 0; c < this.cols; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = r;
+                        cell.dataset.col = c;
+                        
+                        // Шахматный порядок травы
+                        if ((r + c) % 2 === 0) {
+                            cell.style.backgroundImage = "url('https://fortport.ru/photo/51017')";
+                        } else {
+                            cell.style.backgroundImage = "url('https://fortport.ru/photo/51016')";
+                        }
+                        
+                        cell.addEventListener('click', (e) => this.onCellClick(e));
+                        row.appendChild(cell);
+                        this.plants[r][c] = null;
+                    }
+
+                    lawn.appendChild(row);
+                }
+            }
+
+            createMowers() {
+                this.mowers = [];
+                const rows = document.querySelectorAll('.row');
+                rows.forEach((row, index) => {
+                    const mower = document.createElement('img');
+                    mower.src = IMAGES.mower;
+                    mower.className = 'mower';
+                    mower.style.left = '-15px';
+                    row.appendChild(mower);
+                    this.mowers.push({
+                        row: index,
+                        element: mower,
+                        active: false,
+                        x: -15
+                    });
+                });
+            }
+
+            bindEvents() {
+                document.getElementById('seedSunflower').addEventListener('click', () => {
+                    this.audioManager.playSound('seedPacket');
+                    this.togglePlantSelection('sunflower');
+                });
+
+                document.getElementById('seedPeashooter').addEventListener('click', () => {
+                    this.audioManager.playSound('seedPacket');
+                    this.togglePlantSelection('peashooter');
+                });
+
+                document.getElementById('restartBtn').addEventListener('click', () => {
+                    this.restartGame();
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.selectedPlant = null;
+                        this.updateSeedButtons();
+                    }
+                });
+            }
+
+            togglePlantSelection(type) {
+                if (!this.gameRunning) return;
+                
+                const cost = type === 'sunflower' ? 50 : 100;
+                if (this.sunCount < cost) return;
+
+                if (this.selectedPlant === type) {
+                    this.selectedPlant = null;
+                } else {
+                    this.selectedPlant = type;
+                }
+                this.updateSeedButtons();
+            }
+
+            updateSeedButtons() {
+                const sunSeed = document.getElementById('seedSunflower');
+                const peaSeed = document.getElementById('seedPeashooter');
+
+                sunSeed.classList.toggle('selected', this.selectedPlant === 'sunflower');
+                peaSeed.classList.toggle('selected', this.selectedPlant === 'peashooter');
+                sunSeed.classList.toggle('disabled', this.sunCount < 50);
+                peaSeed.classList.toggle('disabled', this.sunCount < 100);
+            }
+
+            onCellClick(e) {
+                if (!this.gameRunning || !this.selectedPlant) return;
+
+                const row = parseInt(e.target.dataset.row);
+                const col = parseInt(e.target.dataset.col);
+
+                if (this.plants[row][col]) return;
+
+                const cost = this.selectedPlant === 'sunflower' ? 50 : 100;
+                if (this.sunCount < cost) return;
+
+                this.sunCount -= cost;
+                this.updateSunDisplay();
+                this.audioManager.playSound('planting');
+                this.plantOnCell(row, col, this.selectedPlant);
+                this.selectedPlant = null;
+                this.updateSeedButtons();
+            }
+
+            plantOnCell(row, col, type) {
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                const plant = document.createElement('img');
+                plant.src = type === 'sunflower' ? IMAGES.sunflower : IMAGES.peashooter;
+                plant.className = 'plant';
+                cell.appendChild(plant);
+                cell.classList.add('occupied');
+                
+                const plantData = {
+                    type: type,
+                    element: plant,
+                    lastShot: 0,
+                    lastSun: Date.now()
+                };
+                
+                this.plants[row][col] = plantData;
+            }
+
+            updateSunDisplay() {
+                document.getElementById('sunCount').textContent = this.sunCount;
+                this.updateSeedButtons();
+            }
+
+            spawnSun() {
+                if (!this.gameRunning) return;
+
+                const row = Math.floor(Math.random() * this.rows);
+                const col = Math.floor(Math.random() * (this.cols - 1));
+                const sun = document.createElement('img');
+                sun.src = IMAGES.sun;
+                sun.className = 'sun';
+                sun.style.left = `${col * 110 + 40}px`;
+                sun.style.top = '-50px';
+                
+                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                rowElement.appendChild(sun);
+                this.suns.push(sun);
+
+                let y = -50;
+                const fallInterval = setInterval(() => {
+                    if (!this.gameRunning) {
+                        clearInterval(fallInterval);
+                        return;
+                    }
+                    y += 3;
+                    sun.style.top = `${y}px`;
+                    
+                    if (y >= 80) {
+                        clearInterval(fallInterval);
+                        sun.style.cursor = 'pointer';
+                        sun.addEventListener('click', () => this.collectSun(sun));
+                        
+                        setTimeout(() => {
+                            if (sun.parentNode) {
+                                this.collectSun(sun);
+                            }
+                        }, 8000);
+                    }
+                }, 30);
+                this.intervals.push(fallInterval);
+            }
+
+            spawnSunFromPlant(row, col) {
+                if (!this.gameRunning) return;
+
+                const sun = document.createElement('img');
+                sun.src = IMAGES.sun;
+                sun.className = 'sun';
+                sun.style.left = `${col * 110 + 50}px`;
+                sun.style.top = `${row * 105 + 30}px`;
+                
+                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                rowElement.appendChild(sun);
+                this.suns.push(sun);
+                
+                sun.style.cursor = 'pointer';
+                sun.addEventListener('click', () => this.collectSun(sun));
+                
+                setTimeout(() => {
+                    if (sun.parentNode) {
+                        this.collectSun(sun);
+                    }
+                }, 10000);
+            }
+
+            collectSun(sunElement) {
+                if (!this.gameRunning || !sunElement.parentNode) return;
+
+                this.sunCount += 25;
+                this.updateSunDisplay();
+                this.audioManager.playSound('sunPickup');
+                sunElement.remove();
+                
+                const index = this.suns.indexOf(sunElement);
+                if (index > -1) {
+                    this.suns.splice(index, 1);
+                }
+            }
+
+            spawnZombie() {
+                if (!this.gameRunning) return;
+
+                this.zombieCounter++;
+                const row = Math.floor(Math.random() * this.rows);
+                const zombie = document.createElement('img');
+                zombie.src = IMAGES.zombie;
+                zombie.className = 'zombie';
+                zombie.style.right = '-70px';
+                zombie.style.top = '15px';
+
+                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                rowElement.appendChild(zombie);
+
+                const zombieObj = {
+                    id: Date.now() + Math.random(),
+                    row: row,
+                    x: 0,
+                    hp: 200,
+                    element: zombie,
+                    alive: true,
+                    speed: 0.4,
+                    eating: false,
+                    damageInterval: null
+                };
+
+                this.zombies.push(zombieObj);
+                this.moveZombie(zombieObj);
+            }
+
+            moveZombie(zombie) {
+                if (!zombie.alive || !this.gameRunning) return;
+
+                const interval = setInterval(() => {
+                    if (!zombie.alive || !this.gameRunning) {
+                        clearInterval(interval);
+                        return;
+                    }
+
+                    let hasPlant = false;
+                    for (let c = 0; c < this.cols; c++) {
+                        if (this.plants[zombie.row][c]) {
+                            const plantX = c * 110;
+                            const zombieX = zombie.x + 70;
+                            
+                            if (zombie.x < plantX + 80 && zombieX > plantX) {
+                                hasPlant = true;
+                                if (!zombie.eating) {
+                                    zombie.eating = true;
+                                    this.startEating(zombie, c);
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!hasPlant) {
+                        if (zombie.eating) {
+                            zombie.eating = false;
+                            if (zombie.damageInterval) {
+                                clearInterval(zombie.damageInterval);
+                            }
+                        }
+                        zombie.x += zombie.speed;
+                        zombie.element.style.right = `${zombie.x}px`;
+                    }
+
+                    if (zombie.x > 900) {
+                        this.activateMower(zombie.row);
+                        zombie.alive = false;
+                        zombie.element.remove();
+                        const index = this.zombies.indexOf(zombie);
+                        if (index > -1) {
+                            this.zombies.splice(index, 1);
+                        }
+                        clearInterval(interval);
+                    }
+                }, 100);
+                this.intervals.push(interval);
+            }
+
+            startEating(zombie, plantCol) {
+                if (zombie.damageInterval) {
+                    clearInterval(zombie.damageInterval);
+                }
+                
+                zombie.damageInterval = setInterval(() => {
+                    if (!zombie.alive || !this.gameRunning) {
+                        clearInterval(zombie.damageInterval);
+                        return;
+                    }
+                    
+                    if (this.plants[zombie.row][plantCol]) {
+                        const plant = this.plants[zombie.row][plantCol];
+                        this.audioManager.playChomp();
+                        plant.element.remove();
+                        this.plants[zombie.row][plantCol] = null;
+                        document.querySelector(`.cell[data-row="${zombie.row}"][data-col="${plantCol}"]`).classList.remove('occupied');
+                        zombie.eating = false;
+                        clearInterval(zombie.damageInterval);
+                    }
+                }, 1000);
+                
+                this.intervals.push(zombie.damageInterval);
+            }
+
+            activateMower(row) {
+                const mower = this.mowers.find(m => m.row === row);
+                if (!mower || mower.active) return;
+
+                mower.active = true;
+                let x = -15;
+                const interval = setInterval(() => {
+                    if (!this.gameRunning) {
+                        clearInterval(interval);
+                        return;
+                    }
+
+                    x += 10;
+                    mower.element.style.left = `${x}px`;
+
+                    this.zombies.forEach(zombie => {
+                        if (zombie.row === row && zombie.alive) {
+                            const zombieX = zombie.x;
+                            if (x > zombieX - 30 && x < zombieX + 30) {
+                                zombie.alive = false;
+                                zombie.element.remove();
+                                if (zombie.damageInterval) {
+                                    clearInterval(zombie.damageInterval);
+                                }
+                            }
+                        }
+                    });
+
+                    if (x > 950) {
+                        clearInterval(interval);
+                        mower.active = false;
+                        mower.element.style.left = '-15px';
+                    }
+                }, 50);
+                this.intervals.push(interval);
+            }
+
+            shootProjectile(row, col) {
+                if (!this.gameRunning) return;
+
+                const projectile = document.createElement('img');
+                projectile.src = IMAGES.projectile;
+                projectile.className = 'projectile';
+                projectile.style.left = `${col * 110 + 60}px`;
+                projectile.style.top = '30px';
+
+                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                rowElement.appendChild(projectile);
+
+                const projectileObj = {
+                    row: row,
+                    x: col * 110 + 60,
+                    element: projectile,
+                    active: true
+                };
+
+                this.projectiles.push(projectileObj);
+
+                const interval = setInterval(() => {
+                    if (!projectileObj.active || !this.gameRunning) {
+                        clearInterval(interval);
+                        return;
+                    }
+
+                    projectileObj.x += 15;
+                    projectileObj.element.style.left = `${projectileObj.x}px`;
+
+                    this.zombies.forEach(zombie => {
+                        if (zombie.row === row && zombie.alive) {
+                            const zombieLeft = zombie.x;
+                            const zombieRight = zombie.x + 65;
+                            
+                            if (projectileObj.x >= zombieLeft && projectileObj.x <= zombieRight) {
+                                zombie.hp -= 20;
+                                projectileObj.active = false;
+                                projectileObj.element.remove();
+                                this.audioManager.playSound('hit');
+                                
+                                if (zombie.hp <= 0) {
+                                    zombie.alive = false;
+                                    zombie.element.remove();
+                                    if (zombie.damageInterval) {
+                                        clearInterval(zombie.damageInterval);
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    if (projectileObj.x > 950) {
+                        projectileObj.active = false;
+                        projectileObj.element.remove();
+                        clearInterval(interval);
+                    }
+                }, 30);
+                this.intervals.push(interval);
+            }
+
+            checkPeashooters() {
+                const now = Date.now();
+                for (let r = 0; r < this.rows; r++) {
+                    let hasZombie = this.zombies.some(z => z.row === r && z.alive);
+                    if (hasZombie) {
+                        for (let c = 0; c < this.cols; c++) {
+                            if (this.plants[r][c] && this.plants[r][c].type === 'peashooter') {
+                                if (now - this.plants[r][c].lastShot >= 1500) {
+                                    this.plants[r][c].lastShot = now;
+                                    this.shootProjectile(r, c);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            checkSunflowers() {
+                const now = Date.now();
+                for (let r = 0; r < this.rows; r++) {
+                    for (let c = 0; c < this.cols; c++) {
+                        if (this.plants[r][c] && this.plants[r][c].type === 'sunflower') {
+                            if (now - this.plants[r][c].lastSun >= 24000) {
+                                this.plants[r][c].lastSun = now;
+                                this.spawnSunFromPlant(r, c);
+                            }
+                        }
+                    }
+                }
+            }
+
+            startGame() {
+                this.gameRunning = true;
+                
+                const zombieInterval = setInterval(() => {
+                    if (this.gameRunning) {
+                        this.spawnZombie();
+                        
+                        if (this.zombieCounter % 10 === 0) {
+                            this.waveNumber++;
+                        }
+                    }
+                }, 3000);
+                this.intervals.push(zombieInterval);
+
+                const sunInterval = setInterval(() => {
+                    if (this.gameRunning) {
+                        this.spawnSun();
+                    }
+                }, 5000);
+                this.intervals.push(sunInterval);
+
+                const gameLoop = setInterval(() => {
+                    if (!this.gameRunning) return;
+                    this.checkPeashooters();
+                    this.checkSunflowers();
+                }, 100);
+                this.intervals.push(gameLoop);
+
+                const firstZombie = setTimeout(() => {
+                    if (this.gameRunning) {
+                        this.spawnZombie();
+                    }
+                }, 5000);
+                this.timeouts.push(firstZombie);
+            }
+
+            restartGame() {
+                this.gameRunning = false;
+                
+                this.intervals.forEach(interval => clearInterval(interval));
+                this.timeouts.forEach(timeout => clearTimeout(timeout));
+                this.intervals = [];
+                this.timeouts = [];
+
+                this.zombies.forEach(zombie => {
+                    if (zombie.damageInterval) clearInterval(zombie.damageInterval);
+                    zombie.element.remove();
+                });
+                this.projectiles.forEach(projectile => projectile.element.remove());
+                this.suns.forEach(sun => sun.remove());
+                
+                this.zombies = [];
+                this.projectiles = [];
+                this.suns = [];
+                this.plants = [];
+                this.sunCount = 150;
+                this.selectedPlant = null;
+                this.zombieCounter = 0;
+                this.waveNumber = 1;
+
+                this.createLawn();
+                this.createMowers();
+                this.updateSunDisplay();
+                this.startGame();
+            }
         }
-        result.textContent = 'шашки'; phrase.textContent = 'бурмалда';
-      }
-    }
 
-    resetBtn.onclick = resetAll;
-    updateColors();
-    renderTtt();
-    checkersPos = createCheckersPosition();
-    renderCheckersBoard();
-  </script>
+        const game = new Game();
+    </script>
 </body>
 </html>
