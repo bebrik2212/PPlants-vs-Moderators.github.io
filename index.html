@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Plants vs Zombies — Дневная Лужайка</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="top-bar">
+            <div class="sun-meter">
+                <div class="sun-orb">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2720/2720081.png" alt="Солнце">
+                </div>
+                <div class="sun-count-wrapper">
+                    <span id="sunCount">150</span>
+                </div>
+            </div>
+
+            <div class="seed-bank">
+                <div class="seed" id="seedSunflower" title="Подсолнух - 50 солнца">
+                    <div class="seed-image">
+                        <img src="https://fortport.ru/photo/55463" alt="Подсолнух">
+                    </div>
+                    <span class="cost">50</span>
+                </div>
+
+                <div class="seed" id="seedPeashooter" title="Горохострел - 100 солнца">
+                    <div class="seed-image">
+                        <img src="https://fortport.ru/photo/55462" alt="Горохострел">
+                    </div>
+                    <span class="cost">100</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="lawn-container">
+            <div class="lawn" id="lawn"></div>
+        </div>
+    </div>
+
+    <img class="ghost-plant" id="ghostPlant" style="display: none;" alt="">
+
+    <script src="game.js"></script>
+</body>
+</html>
