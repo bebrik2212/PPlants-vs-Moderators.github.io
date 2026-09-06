@@ -43,25 +43,20 @@
             display: flex;
             align-items: flex-start;
             justify-content: flex-start;
-
             height: 82px;
             padding: 0;
-
             background:
                 linear-gradient(
                     rgba(100, 35, 10, 0.18),
                     rgba(55, 20, 5, 0.25)
                 ),
                 #8b3f16;
-
             border: 3px solid #321506;
             border-bottom: 4px solid #281005;
-
             box-shadow:
                 inset 0 2px 0 rgba(255,255,255,0.12),
                 inset 0 -4px 8px rgba(0,0,0,0.35),
                 0 2px 4px rgba(0,0,0,0.5);
-
             flex-shrink: 0;
             z-index: 100;
         }
@@ -70,9 +65,7 @@
             content: "";
             position: absolute;
             inset: 3px;
-
             pointer-events: none;
-
             background:
                 repeating-linear-gradient(
                     8deg,
@@ -81,7 +74,6 @@
                     rgba(45, 12, 2, 0.12) 13px,
                     transparent 15px
                 );
-
             opacity: 0.7;
         }
 
@@ -89,29 +81,22 @@
             position: relative;
             width: 74px;
             height: 82px;
-
             display: flex;
             flex-direction: column;
             align-items: center;
-
             margin-left: 5px;
             z-index: 2;
         }
 
         .sun-orb {
             position: relative;
-
             width: 58px;
             height: 58px;
-
             margin-top: -3px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             border-radius: 50%;
-
             background:
                 radial-gradient(
                     circle at 50% 45%,
@@ -121,24 +106,18 @@
                     #e86b00 65%,
                     #672000 100%
                 );
-
             border: 3px solid #3b1605;
-
             box-shadow:
                 inset 0 0 7px rgba(255,255,255,0.8),
                 0 2px 4px rgba(0,0,0,0.7);
         }
 
-        /* кольцо вокруг солнца */
         .sun-orb::before {
             content: "";
             position: absolute;
             inset: -5px;
-
             border-radius: 50%;
-
             border: 2px solid #bd7434;
-
             box-shadow:
                 inset 0 0 5px #000,
                 0 0 3px #000;
@@ -147,33 +126,24 @@
         .sun-orb img {
             width: 48px;
             height: 48px;
-
             object-fit: contain;
-
             filter:
                 drop-shadow(0 1px 1px #6b2c00)
                 drop-shadow(0 0 3px #fff000);
         }
 
-        /* число солнца */
         .sun-count-wrapper {
             position: absolute;
-
             top: 61px;
             left: 8px;
-
             width: 55px;
             height: 22px;
-
             display: flex;
             justify-content: center;
             align-items: center;
-
             background: #f5ead2;
-
             border: 2px solid #4b2814;
             border-radius: 4px;
-
             box-shadow:
                 inset 0 1px 2px rgba(255,255,255,0.8),
                 0 1px 2px rgba(0,0,0,0.7);
@@ -183,37 +153,28 @@
             font-family: Arial, sans-serif;
             font-size: 17px;
             font-weight: 900;
-
             color: #25160c;
-
             text-shadow: 0 1px #fff;
         }
 
         .seed-bank {
             display: flex;
             gap: 3px;
-
             margin-left: 2px;
             height: 76px;
-
             z-index: 2;
         }
 
         .seed {
             position: relative;
-
             width: 50px;
             height: 68px;
-
             margin-top: 5px;
-
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-
             cursor: pointer;
-
             background:
                 linear-gradient(
                     135deg,
@@ -221,15 +182,12 @@
                     #cfc28b 50%,
                     #a99a65 100%
                 );
-
             border: 2px solid #301a0c;
             border-radius: 3px;
-
             box-shadow:
                 inset 1px 1px 0 rgba(255,255,255,0.65),
                 inset -1px -1px 0 rgba(0,0,0,0.35),
                 0 2px 2px rgba(0,0,0,0.5);
-
             transition:
                 transform 0.12s,
                 filter 0.12s;
@@ -242,11 +200,9 @@
 
         .seed.selected {
             border: 3px solid #fff200;
-
             box-shadow:
                 0 0 7px #fff200,
                 inset 1px 1px 0 rgba(255,255,255,0.8);
-
             transform: translateY(-2px);
         }
 
@@ -256,51 +212,37 @@
             pointer-events: none;
         }
 
-        /* картинка растения */
         .seed-image {
             width: 46px;
             height: 51px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             overflow: hidden;
         }
 
         .seed img {
             width: 43px;
             height: 43px;
-
             object-fit: contain;
-
             display: block;
         }
 
-        /* стоимость */
         .seed .cost {
             position: absolute;
-
             bottom: 0;
             left: 0;
             right: 0;
-
             height: 17px;
-
             display: flex;
             justify-content: center;
             align-items: center;
-
             background: #eee4c3;
-
             border-top: 1px solid #6b542d;
-
             font-size: 12px;
             line-height: 12px;
             font-weight: 900;
-
             color: #21150b;
-
             text-shadow: 0 1px #fff;
         }
 
@@ -536,7 +478,6 @@
 </head>
 <body>
     <div class="game-container">
-
         <div class="top-bar">
             <div class="sun-meter">
                 <div class="sun-orb">
@@ -564,9 +505,6 @@
             </div>
         </div>
 
-        <!-- =========================================
-             LAWN
-             ========================================= -->
         <div class="lawn-container">
             <div class="lawn" id="lawn"></div>
         </div>
@@ -661,6 +599,7 @@
                 this.ghostPlant = document.getElementById('ghostPlant');
                 this.cellWidth = 0;
                 this.cellHeight = 0;
+                this.gameStartTime = Date.now();
 
                 this.init();
             }
@@ -1200,16 +1139,31 @@
             startGame() {
                 this.gameRunning = true;
                 
+                // Первый зомби появляется через 20 секунд после начала игры
+                const firstZombieDelay = 20000;
+                
+                // Зомби появляются каждые 8 секунд, но первый через 20 секунд
                 const zombieInterval = setInterval(() => {
                     if (this.gameRunning) {
-                        this.spawnZombie();
-                        
-                        if (this.zombieCounter % 10 === 0) {
-                            this.waveNumber++;
+                        // Проверяем, прошло ли 20 секунд с начала игры
+                        if (Date.now() - this.gameStartTime >= firstZombieDelay) {
+                            this.spawnZombie();
+                            
+                            if (this.zombieCounter % 10 === 0) {
+                                this.waveNumber++;
+                            }
                         }
                     }
                 }, 8000);
                 this.intervals.push(zombieInterval);
+
+                // Первый зомби гарантированно через 20 секунд
+                const firstZombie = setTimeout(() => {
+                    if (this.gameRunning) {
+                        this.spawnZombie();
+                    }
+                }, firstZombieDelay);
+                this.timeouts.push(firstZombie);
 
                 const sunInterval = setInterval(() => {
                     if (this.gameRunning) {
@@ -1224,13 +1178,6 @@
                     this.checkSunflowers();
                 }, 100);
                 this.intervals.push(gameLoop);
-
-                const firstZombie = setTimeout(() => {
-                    if (this.gameRunning) {
-                        this.spawnZombie();
-                    }
-                }, 8000);
-                this.timeouts.push(firstZombie);
             }
         }
 
