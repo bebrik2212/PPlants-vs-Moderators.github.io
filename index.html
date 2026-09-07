@@ -499,7 +499,7 @@
 
                 <div class="seed" id="seedPeashooter" title="Горохострел - 100 солнца">
                     <div class="seed-image">
-                        <img src="https://fortport.ru/photo/55462" alt="Горохострел">
+                        <img src="https://fortport.ru/photo/58667" alt="Горохострел" onerror="this.src='https://fortport.ru/photo/55462'">
                     </div>
                     <span class="cost">100</span>
                 </div>
@@ -516,7 +516,9 @@
     <script>
         const IMAGES = {
             sunflower: 'https://fortport.ru/photo/55463',
-            peashooter: 'https://fortport.ru/photo/55462',
+            peashooter: 'https://fortport.ru/photo/58667',
+            peashooter_fallback: 'https://fortport.ru/photo/55462',
+            peashooter_shoot: 'https://fortport.ru/photo/58745',
             zombie: 'https://fortport.ru/photo/4059',
             projectile: 'https://foni.papik.pro/uploads/posts/2024-09/foni-papik-pro-7vtu-p-kartinki-krug-zelenii-na-prozrachnom-fone-13.png',
             mower: 'https://static.wikia.nocookie.net/plantsvs-zombies/images/1/18/Machine.png/revision/latest/scale-to-width-down/250?cb=20200506143358&path-prefix=ru',
@@ -747,7 +749,13 @@
             plantOnCell(row, col, type) {
                 const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
                 const plant = document.createElement('img');
-                plant.src = type === 'sunflower' ? IMAGES.sunflower : IMAGES.peashooter;
+                let imgSrc = type === 'sunflower' ? IMAGES.sunflower : IMAGES.peashooter;
+                if (type === 'peashooter') {
+                    plant.onerror = function() {
+                        this.src = IMAGES.peashooter_fallback;
+                    };
+                }
+                plant.src = imgSrc;
                 plant.className = 'plant';
                 cell.appendChild(plant);
                 cell.classList.add('occupied');
@@ -759,7 +767,8 @@
                     lastSun: Date.now(),
                     hp: 100,
                     firstSunDelay: type === 'sunflower' ? 5000 + Math.random() * 2000 : 0,
-                    firstSunDone: false
+                    firstSunDone: false,
+                    isShooting: false
                 };
                 
                 this.plants[row][col] = plantData;
@@ -933,7 +942,6 @@
                             const plantX = c * this.cellWidth + offset;
                             const zombieX = zombie.x + offset;
                             
-                            // Проверка пересечения хитбоксов
                             if (zombieX + objectSize > plantX && zombieX < plantX + objectSize) {
                                 hasPlant = true;
                                 if (!zombie.eating) {
@@ -1057,70 +1065,94 @@
             shootProjectile(row, col) {
                 if (!this.gameRunning) return;
 
-                const projectile = document.createElement('img');
-                projectile.src = IMAGES.projectile;
-                projectile.className = 'projectile';
-                const centerX = col * this.cellWidth + this.cellWidth / 2;
-                const centerY = this.cellHeight / 2;
-                projectile.style.left = `${centerX}px`;
-                projectile.style.top = `${centerY - 14}px`;
+                const plantData = this.plants[row][col];
+                if (plantData && plantData.element) {
+                    // Меняем картинку на гифку выстрела
+                    const originalSrc = plantData.element.src;
+                    plantData.element.src = IMAGES.peashooter_shoot;
+                    plantData.element.onerror = function() {
+                        this.src = IMAGES.peashooter_fallback;
+                    };
+                    
+                    // Возвращаем обычную картинку через 1.03 секунды
+                    setTimeout(() => {
+                        if (plantData.element && plantData.element.parentNode) {
+                            plantData.element.src = originalSrc || IMAGES.peashooter;
+                            plantData.element.onerror = function() {
+                                this.src = IMAGES.peashooter_fallback;
+                            };
+                        }
+                    }, 1030);
+                }
 
-                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                rowElement.appendChild(projectile);
+                // Выпускаем снаряд через 50 мс (0.05 сек)
+                setTimeout(() => {
+                    if (!this.gameRunning) return;
 
-                const projectileObj = {
-                    row: row,
-                    x: centerX,
-                    element: projectile,
-                    active: true
-                };
+                    const projectile = document.createElement('img');
+                    projectile.src = IMAGES.projectile;
+                    projectile.className = 'projectile';
+                    const centerX = col * this.cellWidth + this.cellWidth / 2 + 10;
+                    const centerY = this.cellHeight / 2;
+                    projectile.style.left = `${centerX}px`;
+                    projectile.style.top = `${centerY - 14}px`;
 
-                this.projectiles.push(projectileObj);
+                    const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                    rowElement.appendChild(projectile);
 
-                const interval = setInterval(() => {
-                    if (!projectileObj.active || !this.gameRunning) {
-                        clearInterval(interval);
-                        return;
-                    }
+                    const projectileObj = {
+                        row: row,
+                        x: centerX,
+                        element: projectile,
+                        active: true
+                    };
 
-                    projectileObj.x += 8;
-                    projectileObj.element.style.left = `${projectileObj.x}px`;
+                    this.projectiles.push(projectileObj);
 
-                    const objectSize = this.cellWidth * 0.8;
-                    const offset = (this.cellWidth - objectSize) / 2;
+                    const interval = setInterval(() => {
+                        if (!projectileObj.active || !this.gameRunning) {
+                            clearInterval(interval);
+                            return;
+                        }
 
-                    this.zombies.forEach(zombie => {
-                        if (zombie.row === row && zombie.alive) {
-                            const zombieX = zombie.x + offset;
-                            const zombieRight = zombieX + objectSize;
-                            
-                            // Снаряд попадает, когда его центр находится внутри хитбокса зомби
-                            if (projectileObj.x > zombieX && projectileObj.x < zombieRight) {
-                                zombie.hp -= 20;
-                                projectileObj.active = false;
-                                projectileObj.element.remove();
-                                this.audioManager.playSound('hit');
+                        projectileObj.x += 8;
+                        projectileObj.element.style.left = `${projectileObj.x}px`;
+
+                        const objectSize = this.cellWidth * 0.8;
+                        const offset = (this.cellWidth - objectSize) / 2;
+
+                        this.zombies.forEach(zombie => {
+                            if (zombie.row === row && zombie.alive) {
+                                const zombieX = zombie.x + offset;
+                                const zombieRight = zombieX + objectSize;
                                 
-                                this.flashElement(zombie.element, 'flash-white', 300);
-                                
-                                if (zombie.hp <= 0) {
-                                    zombie.alive = false;
-                                    zombie.element.remove();
-                                    if (zombie.damageInterval) {
-                                        clearInterval(zombie.damageInterval);
+                                if (projectileObj.x > zombieX && projectileObj.x < zombieRight) {
+                                    zombie.hp -= 20;
+                                    projectileObj.active = false;
+                                    projectileObj.element.remove();
+                                    this.audioManager.playSound('hit');
+                                    
+                                    this.flashElement(zombie.element, 'flash-white', 300);
+                                    
+                                    if (zombie.hp <= 0) {
+                                        zombie.alive = false;
+                                        zombie.element.remove();
+                                        if (zombie.damageInterval) {
+                                            clearInterval(zombie.damageInterval);
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
 
-                    if (projectileObj.x > window.innerWidth + 50) {
-                        projectileObj.active = false;
-                        projectileObj.element.remove();
-                        clearInterval(interval);
-                    }
-                }, 30);
-                this.intervals.push(interval);
+                        if (projectileObj.x > window.innerWidth + 50) {
+                            projectileObj.active = false;
+                            projectileObj.element.remove();
+                            clearInterval(interval);
+                        }
+                    }, 30);
+                    this.intervals.push(interval);
+                }, 50); // 50 миллисекунд
             }
 
             checkPeashooters() {
@@ -1207,5 +1239,4 @@
         const game = new Game();
     </script>
 </body>
-</html>
 </html>
