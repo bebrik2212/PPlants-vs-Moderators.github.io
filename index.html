@@ -344,6 +344,7 @@
             pointer-events: none;
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
             transition: none;
+            image-rendering: pixelated;
         }
 
         .zombie.flash-white {
@@ -588,12 +589,16 @@
     <img class="ghost-plant" id="ghostPlant" style="display: none;" alt="">
 
     <script>
+        const ZOMBIE_WALK_URL = 'https://media1.tenor.com/m/_3O-LKMO-iMAAAAC/plants-vs-zombies-zombie.gif';
+        const ZOMBIE_EAT_URL = 'https://media.tenor.com/8xtIbhGrYBcAAAAi/eating-eat.gif';
+
         const IMAGES = {
             sunflower: 'https://fortport.ru/photo/59322',
             peashooter: 'https://fortport.ru/photo/58667',
             peashooter_fallback: 'https://fortport.ru/photo/55462',
             peashooter_shoot: 'https://fortport.ru/photo/58745',
-            zombie: 'https://fortport.ru/photo/4059',
+            zombie: ZOMBIE_WALK_URL,    // по умолчанию ходьба
+            zombie_eat: ZOMBIE_EAT_URL, // анимация еды
             projectile: 'https://fortport.ru/photo/59350',
             mower: 'https://static.wikia.nocookie.net/plantsvs-zombies/images/1/18/Machine.png/revision/latest/scale-to-width-down/250?cb=20200506143358&path-prefix=ru',
             sun: 'https://cdn-icons-png.flaticon.com/512/2720/2720081.png',
@@ -1049,7 +1054,6 @@
                     sun.src = IMAGES.sun;
                     sun.className = 'sun';
 
-                    // Получаем позицию подсолнуха
                     const plantRect = plantData.element.getBoundingClientRect();
                     const rowElement = document.querySelector(`.row[data-row="${row}"]`);
                     const rowRect = rowElement.getBoundingClientRect();
@@ -1115,7 +1119,7 @@
                 this.zombieCounter++;
                 const row = Math.floor(Math.random() * this.rows);
                 const zombie = document.createElement('img');
-                zombie.src = IMAGES.zombie;
+                zombie.src = IMAGES.zombie; // ходьба
                 zombie.className = 'zombie';
                 
                 const rowElement = document.querySelector(`.row[data-row="${row}"]`);
@@ -1167,6 +1171,8 @@
                                 if (!zombie.eating) {
                                     zombie.eating = true;
                                     zombie.eatingPlantCol = c;
+                                    // Меняем анимацию на поедание
+                                    zombie.element.src = IMAGES.zombie_eat;
                                     this.startEating(zombie, c);
                                 }
                                 break;
@@ -1181,6 +1187,8 @@
                             if (zombie.damageInterval) {
                                 clearInterval(zombie.damageInterval);
                             }
+                            // Возвращаем анимацию ходьбы
+                            zombie.element.src = IMAGES.zombie;
                         }
                         zombie.x -= zombie.speed;
                         zombie.element.style.left = `${zombie.x}px`;
@@ -1249,11 +1257,15 @@
                             zombie.eating = false;
                             zombie.eatingPlantCol = -1;
                             clearInterval(zombie.damageInterval);
+                            // Возвращаем анимацию ходьбы
+                            zombie.element.src = IMAGES.zombie;
                         }
                     } else {
                         zombie.eating = false;
                         zombie.eatingPlantCol = -1;
                         clearInterval(zombie.damageInterval);
+                        // Возвращаем анимацию ходьбы
+                        zombie.element.src = IMAGES.zombie;
                     }
                 }, 1000);
                 
