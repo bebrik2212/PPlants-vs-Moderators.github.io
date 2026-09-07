@@ -319,10 +319,15 @@
             transition: filter 0.1s;
         }
 
+        /* Анимация выстрела через гифку */
+        .plant.pea-shooting {
+            animation: none;
+        }
+
         .zombie {
             position: absolute;
-            width: 80%;
-            height: 80%;
+            width: 60px;
+            height: 70px;
             object-fit: contain;
             z-index: 7;
             pointer-events: none;
@@ -347,13 +352,13 @@
 
         .mower {
             position: absolute;
-            width: 65px;
-            height: 55px;
+            width: 70px;
+            height: 60px;
             object-fit: contain;
             z-index: 9;
             pointer-events: none;
             filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
-            left: -35px;
+            left: -15px;
             bottom: 5px;
             transition: none;
         }
@@ -659,13 +664,13 @@
                     const mower = document.createElement('img');
                     mower.src = IMAGES.mower;
                     mower.className = 'mower';
-                    mower.style.left = '-35px';
+                    mower.style.left = '-15px';
                     row.appendChild(mower);
                     this.mowers.push({
                         row: index,
                         element: mower,
                         active: false,
-                        x: -35
+                        x: -15
                     });
                 });
             }
@@ -901,16 +906,15 @@
                 
                 const rowElement = document.querySelector(`.row[data-row="${row}"]`);
                 const rowWidth = rowElement.getBoundingClientRect().width;
-                
-                zombie.style.left = `${rowWidth + 10}px`;
-                zombie.style.top = `${this.cellHeight / 2 - (this.cellHeight * 0.8 / 2)}px`;
+                zombie.style.left = `${rowWidth + 50}px`;
+                zombie.style.top = `${this.cellHeight / 2 - 35}px`;
 
                 rowElement.appendChild(zombie);
 
                 const zombieObj = {
                     id: Date.now() + Math.random(),
                     row: row,
-                    x: rowWidth + 10,
+                    x: rowWidth + 50,
                     hp: 200,
                     element: zombie,
                     alive: true,
@@ -934,15 +938,17 @@
                     }
 
                     let hasPlant = false;
-                    const objectSize = this.cellWidth * 0.8;
-                    const offset = (this.cellWidth - objectSize) / 2;
-                    
                     for (let c = 0; c < this.cols; c++) {
                         if (this.plants[zombie.row][c]) {
-                            const plantX = c * this.cellWidth + offset;
-                            const zombieX = zombie.x + offset;
+                            const plantX = c * this.cellWidth;
+                            const zombieHitbox = {
+                                left: zombie.x,
+                                right: zombie.x + 50,
+                                top: 20,
+                                bottom: 60
+                            };
                             
-                            if (zombieX + objectSize > plantX && zombieX < plantX + objectSize) {
+                            if (zombieHitbox.right > plantX && zombieHitbox.left < plantX + this.cellWidth) {
                                 hasPlant = true;
                                 if (!zombie.eating) {
                                     zombie.eating = true;
@@ -966,7 +972,7 @@
                         zombie.element.style.left = `${zombie.x}px`;
                     }
 
-                    if (zombie.x < 10) {
+                    if (zombie.x < 60) {
                         this.activateMower(zombie.row);
                         zombie.alive = false;
                         zombie.element.remove();
@@ -1022,7 +1028,7 @@
                 if (!mower || mower.active) return;
 
                 mower.active = true;
-                let x = -35;
+                let x = -15;
                 const interval = setInterval(() => {
                     if (!this.gameRunning) {
                         clearInterval(interval);
@@ -1032,14 +1038,9 @@
                     x += 10;
                     mower.element.style.left = `${x}px`;
 
-                    const objectSize = this.cellWidth * 0.8;
-                    const offset = (this.cellWidth - objectSize) / 2;
-
                     this.zombies.forEach(zombie => {
                         if (zombie.row === row && zombie.alive) {
-                            const zombieX = zombie.x + offset;
-                            
-                            if (x + 40 > zombieX && x < zombieX + objectSize) {
+                            if (Math.abs(x - zombie.x) < 40) {
                                 this.flashElement(zombie.element, 'flash-white', 300);
                                 zombie.hp -= 200;
                                 if (zombie.hp <= 0) {
@@ -1056,7 +1057,7 @@
                     if (x > window.innerWidth + 100) {
                         clearInterval(interval);
                         mower.active = false;
-                        mower.element.style.left = '-35px';
+                        mower.element.style.left = '-15px';
                     }
                 }, 50);
                 this.intervals.push(interval);
@@ -1085,7 +1086,7 @@
                     }, 1030);
                 }
 
-                // Выпускаем снаряд через 500 мс (0.5 сек)
+                // Выпускаем снаряд через 500 мс
                 setTimeout(() => {
                     if (!this.gameRunning) return;
 
@@ -1118,15 +1119,9 @@
                         projectileObj.x += 8;
                         projectileObj.element.style.left = `${projectileObj.x}px`;
 
-                        const objectSize = this.cellWidth * 0.8;
-                        const offset = (this.cellWidth - objectSize) / 2;
-
                         this.zombies.forEach(zombie => {
                             if (zombie.row === row && zombie.alive) {
-                                const zombieX = zombie.x + offset;
-                                const zombieRight = zombieX + objectSize;
-                                
-                                if (projectileObj.x > zombieX && projectileObj.x < zombieRight) {
+                                if (Math.abs(projectileObj.x - zombie.x) < 30) {
                                     zombie.hp -= 20;
                                     projectileObj.active = false;
                                     projectileObj.element.remove();
@@ -1162,7 +1157,7 @@
                     if (hasZombie) {
                         for (let c = 0; c < this.cols; c++) {
                             if (this.plants[r][c] && this.plants[r][c].type === 'peashooter') {
-                                if (now - this.plants[r][c].lastShot >= 2000) {
+                                if (now - this.plants[r][c].lastShot >= 1500) {
                                     this.plants[r][c].lastShot = now;
                                     this.shootProjectile(r, c);
                                 }
