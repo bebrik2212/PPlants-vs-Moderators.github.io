@@ -589,7 +589,7 @@
     <img class="ghost-plant" id="ghostPlant" style="display: none;" alt="">
 
     <script>
-        const ZOMBIE_WALK_URL = 'https://media1.tenor.com/m/_3O-LKMO-iMAAAAC/plants-vs-zombies-zombie.gif';
+        const ZOMBIE_WALK_URL = 'https://media.tenor.com/MJssZUVyS9UAAAAi/plants-vs-zombies-zombie.gif';
         const ZOMBIE_EAT_URL = 'https://media.tenor.com/8xtIbhGrYBcAAAAi/eating-eat.gif';
 
         const IMAGES = {
@@ -1171,7 +1171,7 @@
                                 if (!zombie.eating) {
                                     zombie.eating = true;
                                     zombie.eatingPlantCol = c;
-                                    // Меняем анимацию на поедание
+
                                     zombie.element.src = IMAGES.zombie_eat;
                                     this.startEating(zombie, c);
                                 }
@@ -1187,7 +1187,7 @@
                             if (zombie.damageInterval) {
                                 clearInterval(zombie.damageInterval);
                             }
-                            // Возвращаем анимацию ходьбы
+                            
                             zombie.element.src = IMAGES.zombie;
                         }
                         zombie.x -= zombie.speed;
