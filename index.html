@@ -788,9 +788,9 @@
                         // Включаем музыку в зависимости от текущего состояния игры
                         const menuOverlay = document.getElementById('menuOverlay');
                         if (menuOverlay && !menuOverlay.classList.contains('hidden')) {
-                            this.menuMusic.play().catch(() => {});
+                            this.playMenuMusic();
                         } else {
-                            this.backgroundMusic.play().catch(() => {});
+                            this.playBackground();
                         }
                     }
                     
@@ -799,9 +799,13 @@
 
                 playMenuMusic() {
                     if (!this.musicEnabled) return;
+                    this.menuMusic.currentTime = 0;
                     this.menuMusic.play().catch(() => {
                         document.addEventListener('click', () => {
-                            if (this.musicEnabled) this.menuMusic.play();
+                            if (this.musicEnabled) {
+                                this.menuMusic.currentTime = 0;
+                                this.menuMusic.play();
+                            }
                         }, { once: true });
                     });
                 }
@@ -813,11 +817,20 @@
 
                 playBackground() {
                     if (!this.musicEnabled) return;
+                    this.backgroundMusic.currentTime = 0;
                     this.backgroundMusic.play().catch(() => {
                         document.addEventListener('click', () => {
-                            if (this.musicEnabled) this.backgroundMusic.play();
+                            if (this.musicEnabled) {
+                                this.backgroundMusic.currentTime = 0;
+                                this.backgroundMusic.play();
+                            }
                         }, { once: true });
                     });
+                }
+
+                stopBackground() {
+                    this.backgroundMusic.pause();
+                    this.backgroundMusic.currentTime = 0;
                 }
 
                 playSound(soundKey) {
@@ -829,9 +842,6 @@
                 }
 
                 playChomp() {
-                    if (!this.musicEnabled) {
-                        // Звуки всегда играют, даже если музыка выключена
-                    }
                     const sounds = [this.sounds.chomp, this.sounds.chomp2];
                     const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
                     if (randomSound) {
@@ -890,6 +900,7 @@
                     setTimeout(() => {
                         splash.classList.add('hidden');
                         menu.classList.remove('hidden');
+                        // Музыка меню начинает играть сразу при появлении меню
                         this.audioManager.playMenuMusic();
                     }, 2000);
 
@@ -1692,5 +1703,4 @@
         })();
     </script>
 </body>
-</html>
 </html>
