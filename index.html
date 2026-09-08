@@ -39,7 +39,6 @@
             overflow: hidden;
         }
 
-        /* ЭКРАН ЗАГРУЗКИ — лого на чёрном, без подсветки */
         .splash-screen {
             position: absolute;
             inset: 0;
@@ -60,7 +59,6 @@
             image-rendering: auto;
         }
 
-        /* МЕНЮ ЗАСТАВКА */
         .menu-overlay {
             position: absolute;
             inset: 0;
@@ -122,7 +120,6 @@
             transform: scale(0.95);
         }
 
-        /* Кнопка управления музыкой в углу */
         .music-toggle {
             position: absolute;
             top: 10px;
@@ -659,17 +656,15 @@
 </head>
 <body>
     <div class="game-container">
-        <!-- КНОПКА УПРАВЛЕНИЯ МУЗЫКОЙ В УГЛУ ЭКРАНА -->
+        
         <div class="music-toggle" id="musicToggle" title="Вкл/Выкл музыку">
             <img id="musicIcon" src="yes.png" alt="Music On">
         </div>
 
-        <!-- СПЛЕШ-ЭКРАН: лого на чёрном фоне, без подсветки -->
         <div class="splash-screen" id="splashScreen">
             <img class="splash-logo" src="хайп.png" alt="Студия">
         </div>
 
-        <!-- МЕНЮ ЗАСТАВКА -->
         <div class="menu-overlay" id="menuOverlay">
             <div class="menu-bg"></div>
             <div class="menu-content">
@@ -781,11 +776,11 @@
                     this.musicEnabled = !this.musicEnabled;
                     
                     if (!this.musicEnabled) {
-                        // Выключаем всю музыку
+
                         this.menuMusic.pause();
                         this.backgroundMusic.pause();
                     } else {
-                        // Включаем музыку в зависимости от текущего состояния игры
+                 
                         const menuOverlay = document.getElementById('menuOverlay');
                         if (menuOverlay && !menuOverlay.classList.contains('hidden')) {
                             this.playMenuMusic();
@@ -900,7 +895,7 @@
                     setTimeout(() => {
                         splash.classList.add('hidden');
                         menu.classList.remove('hidden');
-                        // Музыка меню начинает играть сразу при появлении меню
+                        
                         this.audioManager.playMenuMusic();
                     }, 2000);
 
