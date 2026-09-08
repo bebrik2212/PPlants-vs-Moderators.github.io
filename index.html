@@ -58,7 +58,6 @@
             width: 50%;
             max-width: 280px;
             image-rendering: auto;
-            /* убрали filter: drop-shadow */
         }
 
         /* МЕНЮ ЗАСТАВКА */
@@ -71,11 +70,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.8s ease;
+            transition: none; /* убрали анимацию */
         }
         .menu-overlay.hidden {
             opacity: 0;
             pointer-events: none;
+            transition: none; /* убрали анимацию */
         }
 
         .menu-bg {
@@ -101,15 +101,12 @@
             padding: 20px;
         }
 
-        /* убрали .studio-logo — он больше не используется в меню */
-
         .start-btn {
             width: 55%;
             max-width: 220px;
             cursor: pointer;
             transition: transform 0.15s ease;
             image-rendering: auto;
-            /* убрали filter и box-shadow */
             border: none;
             outline: none;
             background: transparent;
@@ -638,11 +635,10 @@
             <img class="splash-logo" src="хайп.png" alt="Студия">
         </div>
 
-        <!-- МЕНЮ ЗАСТАВКА (без логотипа студии) -->
+        <!-- МЕНЮ ЗАСТАВКА -->
         <div class="menu-overlay" id="menuOverlay">
             <div class="menu-bg"></div>
             <div class="menu-content">
-                <!-- убрали .studio-logo -->
                 <img class="start-btn" src="start.png" alt="Старт" id="startBtn">
             </div>
         </div>
@@ -726,6 +722,7 @@
                 constructor() {
                     this.sounds = {};
                     this.backgroundMusic = null;
+                    this.menuMusic = null;
                     this.initAudio();
                 }
 
@@ -739,6 +736,24 @@
                     this.backgroundMusic = this.sounds.background;
                     this.backgroundMusic.loop = true;
                     this.backgroundMusic.volume = 0.3;
+
+                    // Музыка для меню
+                    this.menuMusic = new Audio('menu.mp3');
+                    this.menuMusic.loop = true;
+                    this.menuMusic.volume = 0.3;
+                }
+
+                playMenuMusic() {
+                    this.menuMusic.play().catch(() => {
+                        document.addEventListener('click', () => {
+                            this.menuMusic.play();
+                        }, { once: true });
+                    });
+                }
+
+                stopMenuMusic() {
+                    this.menuMusic.pause();
+                    this.menuMusic.currentTime = 0;
                 }
 
                 playBackground() {
@@ -798,19 +813,20 @@
                     const menu = document.getElementById('menuOverlay');
                     const startBtn = document.getElementById('startBtn');
 
-                    // Сначала показываем сплеш, меню скрыто
                     splash.classList.remove('hidden');
                     menu.classList.add('hidden');
 
-                    // Через 2 секунды убираем сплеш, показываем меню
                     setTimeout(() => {
                         splash.classList.add('hidden');
                         menu.classList.remove('hidden');
+                        // Запускаем музыку меню
+                        this.audioManager.playMenuMusic();
                     }, 2000);
 
-                    // Обработчик кнопки старта
                     startBtn.addEventListener('click', () => {
-                        menu.classList.add('hidden');
+                        // Останавливаем музыку меню и сразу переключаем без анимаций
+                        this.audioManager.stopMenuMusic();
+                        menu.classList.add('hidden'); // без transition
                         this.startGame();
                         this.audioManager.playBackground();
                     });
@@ -1607,4 +1623,5 @@
         })();
     </script>
 </body>
+</html>
 </html>
