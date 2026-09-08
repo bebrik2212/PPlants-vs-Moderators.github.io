@@ -1,4 +1,4 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -70,12 +70,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: none; /* убрали анимацию */
+            transition: none;
         }
         .menu-overlay.hidden {
             opacity: 0;
             pointer-events: none;
-            transition: none; /* убрали анимацию */
+            transition: none;
         }
 
         .menu-bg {
@@ -120,6 +120,35 @@
 
         .start-btn:active {
             transform: scale(0.95);
+        }
+
+        /* Кнопка управления музыкой в углу */
+        .music-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 3000;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            padding: 5px;
+            transition: transform 0.15s ease, background 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .music-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(0,0,0,0.7);
+        }
+        .music-toggle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
         .top-bar {
@@ -630,6 +659,11 @@
 </head>
 <body>
     <div class="game-container">
+        <!-- КНОПКА УПРАВЛЕНИЯ МУЗЫКОЙ В УГЛУ ЭКРАНА -->
+        <div class="music-toggle" id="musicToggle" title="Вкл/Выкл музыку">
+            <img id="musicIcon" src="yes.png" alt="Music On">
+        </div>
+
         <!-- СПЛЕШ-ЭКРАН: лого на чёрном фоне, без подсветки -->
         <div class="splash-screen" id="splashScreen">
             <img class="splash-logo" src="хайп.png" alt="Студия">
@@ -723,6 +757,7 @@
                     this.sounds = {};
                     this.backgroundMusic = null;
                     this.menuMusic = null;
+                    this.musicEnabled = true;
                     this.initAudio();
                 }
 
@@ -737,16 +772,36 @@
                     this.backgroundMusic.loop = true;
                     this.backgroundMusic.volume = 0.3;
 
-                    // Музыка для меню
                     this.menuMusic = new Audio('menu.mp3');
                     this.menuMusic.loop = true;
                     this.menuMusic.volume = 0.3;
                 }
 
+                toggleMusic() {
+                    this.musicEnabled = !this.musicEnabled;
+                    
+                    if (!this.musicEnabled) {
+                        // Выключаем всю музыку
+                        this.menuMusic.pause();
+                        this.backgroundMusic.pause();
+                    } else {
+                        // Включаем музыку в зависимости от текущего состояния игры
+                        const menuOverlay = document.getElementById('menuOverlay');
+                        if (menuOverlay && !menuOverlay.classList.contains('hidden')) {
+                            this.menuMusic.play().catch(() => {});
+                        } else {
+                            this.backgroundMusic.play().catch(() => {});
+                        }
+                    }
+                    
+                    return this.musicEnabled;
+                }
+
                 playMenuMusic() {
+                    if (!this.musicEnabled) return;
                     this.menuMusic.play().catch(() => {
                         document.addEventListener('click', () => {
-                            this.menuMusic.play();
+                            if (this.musicEnabled) this.menuMusic.play();
                         }, { once: true });
                     });
                 }
@@ -757,9 +812,10 @@
                 }
 
                 playBackground() {
+                    if (!this.musicEnabled) return;
                     this.backgroundMusic.play().catch(() => {
                         document.addEventListener('click', () => {
-                            this.backgroundMusic.play();
+                            if (this.musicEnabled) this.backgroundMusic.play();
                         }, { once: true });
                     });
                 }
@@ -773,6 +829,9 @@
                 }
 
                 playChomp() {
+                    if (!this.musicEnabled) {
+                        // Звуки всегда играют, даже если музыка выключена
+                    }
                     const sounds = [this.sounds.chomp, this.sounds.chomp2];
                     const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
                     if (randomSound) {
@@ -806,6 +865,18 @@
 
                     this.init();
                     this.setupSplashAndMenu();
+                    this.setupMusicToggle();
+                }
+
+                setupMusicToggle() {
+                    const toggleBtn = document.getElementById('musicToggle');
+                    const icon = document.getElementById('musicIcon');
+                    
+                    toggleBtn.addEventListener('click', () => {
+                        const enabled = this.audioManager.toggleMusic();
+                        icon.src = enabled ? 'yes.png' : 'no.png';
+                        icon.alt = enabled ? 'Music On' : 'Music Off';
+                    });
                 }
 
                 setupSplashAndMenu() {
@@ -819,14 +890,12 @@
                     setTimeout(() => {
                         splash.classList.add('hidden');
                         menu.classList.remove('hidden');
-                        // Запускаем музыку меню
                         this.audioManager.playMenuMusic();
                     }, 2000);
 
                     startBtn.addEventListener('click', () => {
-                        // Останавливаем музыку меню и сразу переключаем без анимаций
                         this.audioManager.stopMenuMusic();
-                        menu.classList.add('hidden'); // без transition
+                        menu.classList.add('hidden');
                         this.startGame();
                         this.audioManager.playBackground();
                     });
@@ -1623,4 +1692,5 @@
         })();
     </script>
 </body>
+</html>
 </html>
