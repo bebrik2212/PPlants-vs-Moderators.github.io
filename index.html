@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Plants vs Moderators</title>
     <style>
         * {
@@ -37,6 +37,93 @@
             border: 4px solid #2d1a0c;
             box-shadow: 0 0 30px rgba(0,0,0,0.8);
             overflow: hidden;
+        }
+
+        /* ЭКРАН ЗАГРУЗКИ — лого на чёрном */
+        .splash-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 2000;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+        }
+        .splash-screen.hidden {
+            opacity: 0;
+        }
+        .splash-logo {
+            width: 50%;
+            max-width: 280px;
+            image-rendering: auto;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.15));
+        }
+
+        /* МЕНЮ ЗАСТАВКА */
+        .menu-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1000;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        .menu-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .menu-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('фон.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.95;
+        }
+
+        .menu-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+        }
+
+        .studio-logo {
+            width: 60%;
+            max-width: 240px;
+            image-rendering: auto;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.7));
+        }
+
+        .start-btn {
+            width: 55%;
+            max-width: 220px;
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.2s;
+            image-rendering: auto;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.8));
+        }
+
+        .start-btn:active {
+            transform: scale(0.95);
         }
 
         .top-bar {
@@ -547,6 +634,20 @@
 </head>
 <body>
     <div class="game-container">
+        <!-- СПЛЕШ-ЭКРАН: лого на чёрном фоне -->
+        <div class="splash-screen" id="splashScreen">
+            <img class="splash-logo" src="хайп.png" alt="Студия">
+        </div>
+
+        <!-- МЕНЮ ЗАСТАВКА -->
+        <div class="menu-overlay" id="menuOverlay">
+            <div class="menu-bg"></div>
+            <div class="menu-content">
+                <img class="studio-logo" src="хайп.png" alt="Студия">
+                <img class="start-btn" src="start.png" alt="Старт" id="startBtn">
+            </div>
+        </div>
+
         <div class="top-bar">
             <div class="sun-meter">
                 <div class="sun-orb">
@@ -589,434 +690,515 @@
     <img class="ghost-plant" id="ghostPlant" style="display: none;" alt="">
 
     <script>
-        const ZOMBIE_WALK_URL = 'https://media.tenor.com/MJssZUVyS9UAAAAi/plants-vs-zombies-zombie.gif';
-        const ZOMBIE_EAT_URL = 'https://media.tenor.com/8xtIbhGrYBcAAAAi/eating-eat.gif';
+        (function() {
+            const ZOMBIE_WALK_URL = 'https://media.tenor.com/MJssZUVyS9UAAAAi/plants-vs-zombies-zombie.gif';
+            const ZOMBIE_EAT_URL = 'https://media.tenor.com/8xtIbhGrYBcAAAAi/eating-eat.gif';
 
-        const IMAGES = {
-            sunflower: 'https://fortport.ru/photo/59322',
-            peashooter: 'https://fortport.ru/photo/58667',
-            peashooter_fallback: 'https://fortport.ru/photo/55462',
-            peashooter_shoot: 'https://fortport.ru/photo/58745',
-            zombie: ZOMBIE_WALK_URL,    // по умолчанию ходьба
-            zombie_eat: ZOMBIE_EAT_URL, // анимация еды
-            projectile: 'https://fortport.ru/photo/59350',
-            mower: 'https://static.wikia.nocookie.net/plantsvs-zombies/images/1/18/Machine.png/revision/latest/scale-to-width-down/250?cb=20200506143358&path-prefix=ru',
-            sun: 'https://cdn-icons-png.flaticon.com/512/2720/2720081.png',
-            grass1: 'https://fortport.ru/photo/51017',
-            grass2: 'https://fortport.ru/photo/51016',
-            egg: 'https://fortport.ru/photo/59640',
-            egg_cracked: 'https://fortport.ru/photo/59639',
-            egg_broken: 'https://fortport.ru/photo/59638',
-            egg_dead: 'https://fortport.ru/photo/59641',
-            particle: 'https://fortport.ru/photo/59660'
-        };
+            const IMAGES = {
+                sunflower: 'https://fortport.ru/photo/59322',
+                peashooter: 'https://fortport.ru/photo/58667',
+                peashooter_fallback: 'https://fortport.ru/photo/55462',
+                peashooter_shoot: 'https://fortport.ru/photo/58745',
+                zombie: ZOMBIE_WALK_URL,
+                zombie_eat: ZOMBIE_EAT_URL,
+                projectile: 'https://fortport.ru/photo/59350',
+                mower: 'https://static.wikia.nocookie.net/plantsvs-zombies/images/1/18/Machine.png/revision/latest/scale-to-width-down/250?cb=20200506143358&path-prefix=ru',
+                sun: 'https://cdn-icons-png.flaticon.com/512/2720/2720081.png',
+                grass1: 'https://fortport.ru/photo/51017',
+                grass2: 'https://fortport.ru/photo/51016',
+                egg: 'https://fortport.ru/photo/59640',
+                egg_cracked: 'https://fortport.ru/photo/59639',
+                egg_broken: 'https://fortport.ru/photo/59638',
+                egg_dead: 'https://fortport.ru/photo/59641',
+                particle: 'https://fortport.ru/photo/59660'
+            };
 
-        const AUDIO_FILES = {
-            background: 'plants_vs_zombies_04 - Grasswalk.mp3',
-            sunPickup: 'plants-vs-zombies-sun-pickup.mp3',
-            seedPacket: 'plants-vs-zombies-seed-packet-sound.mp3',
-            planting: 'plants-vs-zombies-planting-sound.mp3',
-            hit: 'plants-vs-zombies-hit.mp3',
-            chomp: 'chomp.mp3',
-            chomp2: 'chomp2.mp3'
-        };
+            const AUDIO_FILES = {
+                background: 'plants_vs_zombies_04 - Grasswalk.mp3',
+                sunPickup: 'plants-vs-zombies-sun-pickup.mp3',
+                seedPacket: 'plants-vs-zombies-seed-packet-sound.mp3',
+                planting: 'plants-vs-zombies-planting-sound.mp3',
+                hit: 'plants-vs-zombies-hit.mp3',
+                chomp: 'chomp.mp3',
+                chomp2: 'chomp2.mp3'
+            };
 
-        class AudioManager {
-            constructor() {
-                this.sounds = {};
-                this.backgroundMusic = null;
-                this.initAudio();
-            }
-
-            initAudio() {
-                for (const [key, file] of Object.entries(AUDIO_FILES)) {
-                    const audio = new Audio(file);
-                    audio.preload = 'auto';
-                    this.sounds[key] = audio;
+            class AudioManager {
+                constructor() {
+                    this.sounds = {};
+                    this.backgroundMusic = null;
+                    this.initAudio();
                 }
 
-                this.backgroundMusic = this.sounds.background;
-                this.backgroundMusic.loop = true;
-                this.backgroundMusic.volume = 0.3;
-            }
-
-            playBackground() {
-                this.backgroundMusic.play().catch(() => {
-                    document.addEventListener('click', () => {
-                        this.backgroundMusic.play();
-                    }, { once: true });
-                });
-            }
-
-            playSound(soundKey) {
-                const sound = this.sounds[soundKey];
-                if (sound) {
-                    sound.currentTime = 0;
-                    sound.play().catch(() => {});
-                }
-            }
-
-            playChomp() {
-                const sounds = [this.sounds.chomp, this.sounds.chomp2];
-                const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
-                if (randomSound) {
-                    randomSound.currentTime = 0;
-                    randomSound.play().catch(() => {});
-                }
-            }
-        }
-
-        class Game {
-            constructor() {
-                this.sunCount = 150;
-                this.selectedPlant = null;
-                this.gameRunning = true;
-                this.rows = 5;
-                this.cols = 9;
-                this.plants = [];
-                this.zombies = [];
-                this.projectiles = [];
-                this.mowers = [];
-                this.suns = [];
-                this.intervals = [];
-                this.timeouts = [];
-                this.zombieCounter = 0;
-                this.waveNumber = 1;
-                this.audioManager = new AudioManager();
-                this.ghostPlant = document.getElementById('ghostPlant');
-                this.cellWidth = 0;
-                this.cellHeight = 0;
-                this.gameStartTime = Date.now();
-
-                this.init();
-            }
-
-            init() {
-                this.createLawn();
-                this.createMowers();
-                this.bindEvents();
-                this.startGame();
-                this.audioManager.playBackground();
-            }
-
-            createLawn() {
-                const lawn = document.getElementById('lawn');
-                lawn.innerHTML = '';
-
-                for (let r = 0; r < this.rows; r++) {
-                    this.plants[r] = [];
-                    const row = document.createElement('div');
-                    row.className = 'row';
-                    row.dataset.row = r;
-
-                    for (let c = 0; c < this.cols; c++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cell';
-                        cell.dataset.row = r;
-                        cell.dataset.col = c;
-                        
-                        if ((r + c) % 2 === 0) {
-                            cell.style.backgroundImage = `url('${IMAGES.grass1}')`;
-                        } else {
-                            cell.style.backgroundImage = `url('${IMAGES.grass2}')`;
-                        }
-                        
-                        cell.addEventListener('click', (e) => this.onCellClick(e));
-                        row.appendChild(cell);
-                        this.plants[r][c] = null;
+                initAudio() {
+                    for (const [key, file] of Object.entries(AUDIO_FILES)) {
+                        const audio = new Audio(file);
+                        audio.preload = 'auto';
+                        this.sounds[key] = audio;
                     }
 
-                    lawn.appendChild(row);
+                    this.backgroundMusic = this.sounds.background;
+                    this.backgroundMusic.loop = true;
+                    this.backgroundMusic.volume = 0.3;
                 }
 
-                setTimeout(() => {
-                    const firstCell = document.querySelector('.cell');
-                    this.cellWidth = firstCell.getBoundingClientRect().width;
-                    this.cellHeight = firstCell.getBoundingClientRect().height;
-                }, 100);
-            }
-
-            createMowers() {
-                this.mowers = [];
-                const rows = document.querySelectorAll('.row');
-                rows.forEach((row, index) => {
-                    const mower = document.createElement('img');
-                    mower.src = IMAGES.mower;
-                    mower.className = 'mower';
-                    mower.style.left = '-15px';
-                    row.appendChild(mower);
-                    this.mowers.push({
-                        row: index,
-                        element: mower,
-                        active: false,
-                        x: -15
+                playBackground() {
+                    this.backgroundMusic.play().catch(() => {
+                        document.addEventListener('click', () => {
+                            this.backgroundMusic.play();
+                        }, { once: true });
                     });
-                });
+                }
+
+                playSound(soundKey) {
+                    const sound = this.sounds[soundKey];
+                    if (sound) {
+                        sound.currentTime = 0;
+                        sound.play().catch(() => {});
+                    }
+                }
+
+                playChomp() {
+                    const sounds = [this.sounds.chomp, this.sounds.chomp2];
+                    const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+                    if (randomSound) {
+                        randomSound.currentTime = 0;
+                        randomSound.play().catch(() => {});
+                    }
+                }
             }
 
-            bindEvents() {
-                document.getElementById('seedSunflower').addEventListener('click', () => {
-                    this.audioManager.playSound('seedPacket');
-                    this.togglePlantSelection('sunflower');
-                });
+            class Game {
+                constructor() {
+                    this.sunCount = 150;
+                    this.selectedPlant = null;
+                    this.gameRunning = false;
+                    this.rows = 5;
+                    this.cols = 9;
+                    this.plants = [];
+                    this.zombies = [];
+                    this.projectiles = [];
+                    this.mowers = [];
+                    this.suns = [];
+                    this.intervals = [];
+                    this.timeouts = [];
+                    this.zombieCounter = 0;
+                    this.waveNumber = 1;
+                    this.audioManager = new AudioManager();
+                    this.ghostPlant = document.getElementById('ghostPlant');
+                    this.cellWidth = 0;
+                    this.cellHeight = 0;
+                    this.gameStartTime = 0;
 
-                document.getElementById('seedPeashooter').addEventListener('click', () => {
-                    this.audioManager.playSound('seedPacket');
-                    this.togglePlantSelection('peashooter');
-                });
+                    this.init();
+                    this.setupSplashAndMenu();
+                }
 
-                document.getElementById('seedEgg').addEventListener('click', () => {
-                    this.audioManager.playSound('seedPacket');
-                    this.togglePlantSelection('egg');
-                });
+                setupSplashAndMenu() {
+                    const splash = document.getElementById('splashScreen');
+                    const menu = document.getElementById('menuOverlay');
+                    const startBtn = document.getElementById('startBtn');
 
-                document.addEventListener('mousemove', (e) => {
-                    if (this.selectedPlant && this.gameRunning) {
-                        this.ghostPlant.style.display = 'block';
-                        this.ghostPlant.style.left = e.clientX + 'px';
-                        this.ghostPlant.style.top = e.clientY + 'px';
-                    } else {
-                        this.ghostPlant.style.display = 'none';
+                    // Сначала показываем сплеш, меню скрыто (прозрачно)
+                    splash.classList.remove('hidden');
+                    menu.classList.add('hidden');
+
+                    // Через 2 секунды убираем сплеш, показываем меню
+                    setTimeout(() => {
+                        splash.classList.add('hidden');
+                        menu.classList.remove('hidden');
+                    }, 2000);
+
+                    // Обработчик кнопки старта
+                    startBtn.addEventListener('click', () => {
+                        menu.classList.add('hidden');
+                        this.startGame();
+                        this.audioManager.playBackground();
+                    });
+                }
+
+                init() {
+                    this.createLawn();
+                    this.createMowers();
+                    this.bindEvents();
+                    this.updateSunDisplay();
+                }
+
+                createLawn() {
+                    const lawn = document.getElementById('lawn');
+                    lawn.innerHTML = '';
+
+                    for (let r = 0; r < this.rows; r++) {
+                        this.plants[r] = [];
+                        const row = document.createElement('div');
+                        row.className = 'row';
+                        row.dataset.row = r;
+
+                        for (let c = 0; c < this.cols; c++) {
+                            const cell = document.createElement('div');
+                            cell.className = 'cell';
+                            cell.dataset.row = r;
+                            cell.dataset.col = c;
+
+                            if ((r + c) % 2 === 0) {
+                                cell.style.backgroundImage = `url('${IMAGES.grass1}')`;
+                            } else {
+                                cell.style.backgroundImage = `url('${IMAGES.grass2}')`;
+                            }
+
+                            cell.addEventListener('click', (e) => this.onCellClick(e));
+                            row.appendChild(cell);
+                            this.plants[r][c] = null;
+                        }
+
+                        lawn.appendChild(row);
                     }
-                });
 
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
+                    setTimeout(() => {
+                        const firstCell = document.querySelector('.cell');
+                        this.cellWidth = firstCell.getBoundingClientRect().width;
+                        this.cellHeight = firstCell.getBoundingClientRect().height;
+                    }, 100);
+                }
+
+                createMowers() {
+                    this.mowers = [];
+                    const rows = document.querySelectorAll('.row');
+                    rows.forEach((row, index) => {
+                        const mower = document.createElement('img');
+                        mower.src = IMAGES.mower;
+                        mower.className = 'mower';
+                        mower.style.left = '-15px';
+                        row.appendChild(mower);
+                        this.mowers.push({
+                            row: index,
+                            element: mower,
+                            active: false,
+                            x: -15
+                        });
+                    });
+                }
+
+                bindEvents() {
+                    document.getElementById('seedSunflower').addEventListener('click', () => {
+                        this.audioManager.playSound('seedPacket');
+                        this.togglePlantSelection('sunflower');
+                    });
+
+                    document.getElementById('seedPeashooter').addEventListener('click', () => {
+                        this.audioManager.playSound('seedPacket');
+                        this.togglePlantSelection('peashooter');
+                    });
+
+                    document.getElementById('seedEgg').addEventListener('click', () => {
+                        this.audioManager.playSound('seedPacket');
+                        this.togglePlantSelection('egg');
+                    });
+
+                    document.addEventListener('mousemove', (e) => {
+                        if (this.selectedPlant && this.gameRunning) {
+                            this.ghostPlant.style.display = 'block';
+                            this.ghostPlant.style.left = e.clientX + 'px';
+                            this.ghostPlant.style.top = e.clientY + 'px';
+                        } else {
+                            this.ghostPlant.style.display = 'none';
+                        }
+                    });
+
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            this.selectedPlant = null;
+                            this.updateSeedButtons();
+                            this.ghostPlant.style.display = 'none';
+                        }
+                    });
+                }
+
+                togglePlantSelection(type) {
+                    if (!this.gameRunning) return;
+
+                    let cost = type === 'sunflower' ? 50 : type === 'peashooter' ? 100 : 50;
+                    if (this.sunCount < cost) return;
+
+                    if (this.selectedPlant === type) {
                         this.selectedPlant = null;
-                        this.updateSeedButtons();
                         this.ghostPlant.style.display = 'none';
+                    } else {
+                        this.selectedPlant = type;
+                        this.ghostPlant.src = type === 'sunflower' ? IMAGES.sunflower :
+                            type === 'peashooter' ? IMAGES.peashooter : IMAGES.egg;
                     }
-                });
-            }
+                    this.updateSeedButtons();
+                }
 
-            togglePlantSelection(type) {
-                if (!this.gameRunning) return;
-                
-                let cost = type === 'sunflower' ? 50 : type === 'peashooter' ? 100 : 50;
-                if (this.sunCount < cost) return;
+                updateSeedButtons() {
+                    const sunSeed = document.getElementById('seedSunflower');
+                    const peaSeed = document.getElementById('seedPeashooter');
+                    const eggSeed = document.getElementById('seedEgg');
 
-                if (this.selectedPlant === type) {
+                    sunSeed.classList.toggle('selected', this.selectedPlant === 'sunflower');
+                    peaSeed.classList.toggle('selected', this.selectedPlant === 'peashooter');
+                    eggSeed.classList.toggle('selected', this.selectedPlant === 'egg');
+                    sunSeed.classList.toggle('disabled', this.sunCount < 50);
+                    peaSeed.classList.toggle('disabled', this.sunCount < 100);
+                    eggSeed.classList.toggle('disabled', this.sunCount < 50);
+                }
+
+                onCellClick(e) {
+                    if (!this.gameRunning || !this.selectedPlant) return;
+
+                    const row = parseInt(e.target.dataset.row);
+                    const col = parseInt(e.target.dataset.col);
+
+                    if (this.plants[row][col]) return;
+
+                    let cost = this.selectedPlant === 'sunflower' ? 50 : this.selectedPlant === 'peashooter' ? 100 : 50;
+                    if (this.sunCount < cost) return;
+
+                    this.sunCount -= cost;
+                    this.updateSunDisplay();
+                    this.audioManager.playSound('planting');
+                    this.plantOnCell(row, col, this.selectedPlant);
                     this.selectedPlant = null;
                     this.ghostPlant.style.display = 'none';
-                } else {
-                    this.selectedPlant = type;
-                    this.ghostPlant.src = type === 'sunflower' ? IMAGES.sunflower : 
-                                           type === 'peashooter' ? IMAGES.peashooter : IMAGES.egg;
-                }
-                this.updateSeedButtons();
-            }
-
-            updateSeedButtons() {
-                const sunSeed = document.getElementById('seedSunflower');
-                const peaSeed = document.getElementById('seedPeashooter');
-                const eggSeed = document.getElementById('seedEgg');
-
-                sunSeed.classList.toggle('selected', this.selectedPlant === 'sunflower');
-                peaSeed.classList.toggle('selected', this.selectedPlant === 'peashooter');
-                eggSeed.classList.toggle('selected', this.selectedPlant === 'egg');
-                sunSeed.classList.toggle('disabled', this.sunCount < 50);
-                peaSeed.classList.toggle('disabled', this.sunCount < 100);
-                eggSeed.classList.toggle('disabled', this.sunCount < 50);
-            }
-
-            onCellClick(e) {
-                if (!this.gameRunning || !this.selectedPlant) return;
-
-                const row = parseInt(e.target.dataset.row);
-                const col = parseInt(e.target.dataset.col);
-
-                if (this.plants[row][col]) return;
-
-                let cost = this.selectedPlant === 'sunflower' ? 50 : this.selectedPlant === 'peashooter' ? 100 : 50;
-                if (this.sunCount < cost) return;
-
-                this.sunCount -= cost;
-                this.updateSunDisplay();
-                this.audioManager.playSound('planting');
-                this.plantOnCell(row, col, this.selectedPlant);
-                this.selectedPlant = null;
-                this.ghostPlant.style.display = 'none';
-                this.updateSeedButtons();
-            }
-
-            plantOnCell(row, col, type) {
-                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
-                const plant = document.createElement('img');
-                let imgSrc;
-                let plantData;
-
-                if (type === 'sunflower') {
-                    imgSrc = IMAGES.sunflower;
-                    plantData = {
-                        type: 'sunflower',
-                        element: plant,
-                        lastShot: 0,
-                        lastSun: Date.now(),
-                        hp: 100,
-                        firstSunDelay: 5000 + Math.random() * 2000,
-                        firstSunDone: false,
-                        isShooting: false,
-                        row: row,
-                        col: col,
-                        isFlashing: false
-                    };
-                } else if (type === 'peashooter') {
-                    imgSrc = IMAGES.peashooter;
-                    plant.onerror = function() {
-                        this.src = IMAGES.peashooter_fallback;
-                    };
-                    plantData = {
-                        type: 'peashooter',
-                        element: plant,
-                        lastShot: 0,
-                        lastSun: Date.now(),
-                        hp: 100,
-                        firstSunDelay: 0,
-                        firstSunDone: true,
-                        isShooting: false,
-                        row: row,
-                        col: col,
-                        originalSrc: imgSrc
-                    };
-                } else if (type === 'egg') {
-                    imgSrc = IMAGES.egg;
-                    plantData = {
-                        type: 'egg',
-                        element: plant,
-                        lastShot: 0,
-                        lastSun: Date.now(),
-                        hp: 4000,
-                        maxHp: 4000,
-                        firstSunDelay: 0,
-                        firstSunDone: true,
-                        isShooting: false,
-                        phase: 1,
-                        row: row,
-                        col: col
-                    };
+                    this.updateSeedButtons();
                 }
 
-                plant.src = imgSrc;
-                plant.className = 'plant';
-                cell.appendChild(plant);
-                cell.classList.add('occupied');
+                plantOnCell(row, col, type) {
+                    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                    const plant = document.createElement('img');
+                    let imgSrc;
+                    let plantData;
 
-                this.plants[row][col] = plantData;
-            }
+                    if (type === 'sunflower') {
+                        imgSrc = IMAGES.sunflower;
+                        plantData = {
+                            type: 'sunflower',
+                            element: plant,
+                            lastShot: 0,
+                            lastSun: Date.now(),
+                            hp: 100,
+                            firstSunDelay: 5000 + Math.random() * 2000,
+                            firstSunDone: false,
+                            isShooting: false,
+                            row: row,
+                            col: col,
+                            isFlashing: false
+                        };
+                    } else if (type === 'peashooter') {
+                        imgSrc = IMAGES.peashooter;
+                        plant.onerror = function() {
+                            this.src = IMAGES.peashooter_fallback;
+                        };
+                        plantData = {
+                            type: 'peashooter',
+                            element: plant,
+                            lastShot: 0,
+                            lastSun: Date.now(),
+                            hp: 100,
+                            firstSunDelay: 0,
+                            firstSunDone: true,
+                            isShooting: false,
+                            row: row,
+                            col: col,
+                            originalSrc: imgSrc
+                        };
+                    } else if (type === 'egg') {
+                        imgSrc = IMAGES.egg;
+                        plantData = {
+                            type: 'egg',
+                            element: plant,
+                            lastShot: 0,
+                            lastSun: Date.now(),
+                            hp: 4000,
+                            maxHp: 4000,
+                            firstSunDelay: 0,
+                            firstSunDone: true,
+                            isShooting: false,
+                            phase: 1,
+                            row: row,
+                            col: col
+                        };
+                    }
 
-            updateEggPhase(plantData, row, col) {
-                if (plantData.type !== 'egg') return;
+                    plant.src = imgSrc;
+                    plant.className = 'plant';
+                    cell.appendChild(plant);
+                    cell.classList.add('occupied');
 
-                const hp = plantData.hp;
-                const maxHp = plantData.maxHp;
-                const ratio = hp / maxHp;
-                let newPhase;
-
-                if (hp <= 0) {
-                    newPhase = 4;
-                } else if (ratio > 0.66) {
-                    newPhase = 1;
-                } else if (ratio > 0.33) {
-                    newPhase = 2;
-                } else {
-                    newPhase = 3;
+                    this.plants[row][col] = plantData;
                 }
 
-                if (newPhase !== plantData.phase) {
-                    plantData.phase = newPhase;
-                    const el = plantData.element;
-                    
-                    if (newPhase === 1) {
-                        el.src = IMAGES.egg;
-                        el.classList.remove('phase-2', 'phase-3');
-                    } else if (newPhase === 2) {
-                        el.src = IMAGES.egg_cracked;
-                        el.classList.add('phase-2');
-                        el.classList.remove('phase-3');
-                    } else if (newPhase === 3) {
-                        el.src = IMAGES.egg_broken;
-                        el.classList.remove('phase-2');
-                        el.classList.add('phase-3');
-                    } else if (newPhase === 4) {
-                        el.src = IMAGES.egg_dead;
-                        el.classList.remove('phase-2', 'phase-3');
+                updateEggPhase(plantData, row, col) {
+                    if (plantData.type !== 'egg') return;
+
+                    const hp = plantData.hp;
+                    const maxHp = plantData.maxHp;
+                    const ratio = hp / maxHp;
+                    let newPhase;
+
+                    if (hp <= 0) {
+                        newPhase = 4;
+                    } else if (ratio > 0.66) {
+                        newPhase = 1;
+                    } else if (ratio > 0.33) {
+                        newPhase = 2;
+                    } else {
+                        newPhase = 3;
+                    }
+
+                    if (newPhase !== plantData.phase) {
+                        plantData.phase = newPhase;
+                        const el = plantData.element;
+
+                        if (newPhase === 1) {
+                            el.src = IMAGES.egg;
+                            el.classList.remove('phase-2', 'phase-3');
+                        } else if (newPhase === 2) {
+                            el.src = IMAGES.egg_cracked;
+                            el.classList.add('phase-2');
+                            el.classList.remove('phase-3');
+                        } else if (newPhase === 3) {
+                            el.src = IMAGES.egg_broken;
+                            el.classList.remove('phase-2');
+                            el.classList.add('phase-3');
+                        } else if (newPhase === 4) {
+                            el.src = IMAGES.egg_dead;
+                            el.classList.remove('phase-2', 'phase-3');
+                        }
                     }
                 }
-            }
 
-            spawnParticle(row, col) {
-                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
-                if (!cell) return;
+                spawnParticle(row, col) {
+                    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                    if (!cell) return;
 
-                const particle = document.createElement('img');
-                particle.src = IMAGES.particle;
-                particle.className = 'particle';
-                
-                const offsetX = (Math.random() - 0.5) * 30;
-                const offsetY = (Math.random() - 0.5) * 30;
-                
-                particle.style.left = `calc(50% + ${offsetX}px)`;
-                particle.style.top = `calc(50% + ${offsetY}px)`;
-                particle.style.setProperty('--tx', (Math.random() - 0.5) * 80 + 'px');
-                particle.style.setProperty('--ty', (Math.random() - 0.5) * 80 - 30 + 'px');
-                
-                cell.appendChild(particle);
-                
-                setTimeout(() => {
-                    if (particle.parentNode) particle.remove();
-                }, 800);
-            }
+                    const particle = document.createElement('img');
+                    particle.src = IMAGES.particle;
+                    particle.className = 'particle';
 
-            updateSunDisplay() {
-                document.getElementById('sunCount').textContent = this.sunCount;
-                this.updateSeedButtons();
-            }
+                    const offsetX = (Math.random() - 0.5) * 30;
+                    const offsetY = (Math.random() - 0.5) * 30;
 
-            flashElement(element, className, duration = 300) {
-                if (!element) return;
-                element.classList.add(className);
-                setTimeout(() => {
-                    element.classList.remove(className);
-                }, duration);
-            }
+                    particle.style.left = `calc(50% + ${offsetX}px)`;
+                    particle.style.top = `calc(50% + ${offsetY}px)`;
+                    particle.style.setProperty('--tx', (Math.random() - 0.5) * 80 + 'px');
+                    particle.style.setProperty('--ty', (Math.random() - 0.5) * 80 - 30 + 'px');
 
-            spawnSun() {
-                if (!this.gameRunning) return;
+                    cell.appendChild(particle);
 
-                const row = Math.floor(Math.random() * this.rows);
-                const col = Math.floor(Math.random() * (this.cols - 1));
-                const sun = document.createElement('img');
-                sun.src = IMAGES.sun;
-                sun.className = 'sun';
-                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                const cellWidth = this.cellWidth;
-                
-                const sunX = col * cellWidth + cellWidth / 2 - 20;
-                sun.style.left = `${sunX}px`;
-                sun.style.top = '-50px';
-                sun.style.opacity = '1';
-                
-                sun.style.cursor = 'pointer';
-                sun.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.collectSun(sun);
-                });
-                
-                rowElement.appendChild(sun);
-                this.suns.push(sun);
+                    setTimeout(() => {
+                        if (particle.parentNode) particle.remove();
+                    }, 800);
+                }
 
-                let y = -50;
-                const fallInterval = setInterval(() => {
-                    if (!this.gameRunning) {
-                        clearInterval(fallInterval);
-                        return;
-                    }
-                    y += 3;
-                    sun.style.top = `${y}px`;
-                    
-                    if (y >= row * this.cellHeight + this.cellHeight / 2 - 20) {
-                        clearInterval(fallInterval);
-                        
+                updateSunDisplay() {
+                    document.getElementById('sunCount').textContent = this.sunCount;
+                    this.updateSeedButtons();
+                }
+
+                flashElement(element, className, duration = 300) {
+                    if (!element) return;
+                    element.classList.add(className);
+                    setTimeout(() => {
+                        element.classList.remove(className);
+                    }, duration);
+                }
+
+                spawnSun() {
+                    if (!this.gameRunning) return;
+
+                    const row = Math.floor(Math.random() * this.rows);
+                    const col = Math.floor(Math.random() * (this.cols - 1));
+                    const sun = document.createElement('img');
+                    sun.src = IMAGES.sun;
+                    sun.className = 'sun';
+                    const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                    const cellWidth = this.cellWidth;
+
+                    const sunX = col * cellWidth + cellWidth / 2 - 20;
+                    sun.style.left = `${sunX}px`;
+                    sun.style.top = '-50px';
+                    sun.style.opacity = '1';
+
+                    sun.style.cursor = 'pointer';
+                    sun.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.collectSun(sun);
+                    });
+
+                    rowElement.appendChild(sun);
+                    this.suns.push(sun);
+
+                    let y = -50;
+                    const fallInterval = setInterval(() => {
+                        if (!this.gameRunning) {
+                            clearInterval(fallInterval);
+                            return;
+                        }
+                        y += 3;
+                        sun.style.top = `${y}px`;
+
+                        if (y >= row * this.cellHeight + this.cellHeight / 2 - 20) {
+                            clearInterval(fallInterval);
+
+                            setTimeout(() => {
+                                if (sun.parentNode) {
+                                    sun.classList.add('sun-fade-out');
+                                    setTimeout(() => {
+                                        if (sun.parentNode) {
+                                            sun.remove();
+                                            const index = this.suns.indexOf(sun);
+                                            if (index > -1) {
+                                                this.suns.splice(index, 1);
+                                            }
+                                        }
+                                    }, 500);
+                                }
+                            }, 10000);
+                        }
+                    }, 30);
+                    this.intervals.push(fallInterval);
+                }
+
+                spawnSunFromPlant(row, col) {
+                    if (!this.gameRunning) return;
+
+                    const plantData = this.plants[row][col];
+                    if (!plantData || plantData.type !== 'sunflower') return;
+
+                    plantData.isFlashing = true;
+                    plantData.element.classList.add('sun-flash');
+
+                    setTimeout(() => {
+                        if (!this.gameRunning || !plantData.element || !plantData.element.parentNode) {
+                            return;
+                        }
+
+                        const sun = document.createElement('img');
+                        sun.src = IMAGES.sun;
+                        sun.className = 'sun';
+
+                        const plantRect = plantData.element.getBoundingClientRect();
+                        const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                        const rowRect = rowElement.getBoundingClientRect();
+
+                        const sunX = plantRect.left - rowRect.left + plantRect.width / 2 - 20;
+                        const sunY = plantRect.top - rowRect.top + plantRect.height / 2 - 20;
+
+                        sun.style.left = `${sunX}px`;
+                        sun.style.top = `${sunY}px`;
+                        sun.style.opacity = '1';
+                        sun.style.cursor = 'pointer';
+
+                        sun.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.collectSun(sun);
+                        });
+
+                        rowElement.appendChild(sun);
+                        this.suns.push(sun);
+
                         setTimeout(() => {
                             if (sun.parentNode) {
                                 sun.classList.add('sun-fade-out');
@@ -1030,351 +1212,209 @@
                                     }
                                 }, 500);
                             }
-                        }, 10000);
-                    }
-                }, 30);
-                this.intervals.push(fallInterval);
-            }
+                        }, 2000);
 
-            spawnSunFromPlant(row, col) {
-                if (!this.gameRunning) return;
-
-                const plantData = this.plants[row][col];
-                if (!plantData || plantData.type !== 'sunflower') return;
-
-                plantData.isFlashing = true;
-                plantData.element.classList.add('sun-flash');
-
-                setTimeout(() => {
-                    if (!this.gameRunning || !plantData.element || !plantData.element.parentNode) {
-                        return;
-                    }
-
-                    const sun = document.createElement('img');
-                    sun.src = IMAGES.sun;
-                    sun.className = 'sun';
-
-                    const plantRect = plantData.element.getBoundingClientRect();
-                    const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                    const rowRect = rowElement.getBoundingClientRect();
-
-                    const sunX = plantRect.left - rowRect.left + plantRect.width / 2 - 20;
-                    const sunY = plantRect.top - rowRect.top + plantRect.height / 2 - 20;
-
-                    sun.style.left = `${sunX}px`;
-                    sun.style.top = `${sunY}px`;
-                    sun.style.opacity = '1';
-                    sun.style.cursor = 'pointer';
-
-                    sun.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.collectSun(sun);
-                    });
-
-                    rowElement.appendChild(sun);
-                    this.suns.push(sun);
+                    }, 1500);
 
                     setTimeout(() => {
-                        if (sun.parentNode) {
-                            sun.classList.add('sun-fade-out');
-                            setTimeout(() => {
-                                if (sun.parentNode) {
-                                    sun.remove();
-                                    const index = this.suns.indexOf(sun);
-                                    if (index > -1) {
-                                        this.suns.splice(index, 1);
-                                    }
-                                }
-                            }, 500);
+                        if (plantData.element && plantData.element.parentNode) {
+                            plantData.element.classList.remove('sun-flash');
+                            plantData.isFlashing = false;
                         }
-                    }, 2000);
-
-                }, 1500);
-
-                setTimeout(() => {
-                    if (plantData.element && plantData.element.parentNode) {
-                        plantData.element.classList.remove('sun-flash');
-                        plantData.isFlashing = false;
-                    }
-                }, 1500);
-            }
-
-            collectSun(sunElement) {
-                if (!this.gameRunning || !sunElement.parentNode) return;
-
-                this.sunCount += 25;
-                this.updateSunDisplay();
-                this.audioManager.playSound('sunPickup');
-                sunElement.remove();
-                
-                const index = this.suns.indexOf(sunElement);
-                if (index > -1) {
-                    this.suns.splice(index, 1);
+                    }, 1500);
                 }
-            }
 
-            spawnZombie() {
-                if (!this.gameRunning) return;
+                collectSun(sunElement) {
+                    if (!this.gameRunning || !sunElement.parentNode) return;
 
-                this.zombieCounter++;
-                const row = Math.floor(Math.random() * this.rows);
-                const zombie = document.createElement('img');
-                zombie.src = IMAGES.zombie; // ходьба
-                zombie.className = 'zombie';
-                
-                const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                const rowWidth = rowElement.getBoundingClientRect().width;
-                zombie.style.left = `${rowWidth + 50}px`;
-                zombie.style.top = `${this.cellHeight / 2 - 35}px`;
+                    this.sunCount += 25;
+                    this.updateSunDisplay();
+                    this.audioManager.playSound('sunPickup');
+                    sunElement.remove();
 
-                rowElement.appendChild(zombie);
-
-                const zombieObj = {
-                    id: Date.now() + Math.random(),
-                    row: row,
-                    x: rowWidth + 50,
-                    hp: 200,
-                    element: zombie,
-                    alive: true,
-                    speed: 0.7,
-                    eating: false,
-                    damageInterval: null,
-                    eatingPlantCol: -1
-                };
-
-                this.zombies.push(zombieObj);
-                this.moveZombie(zombieObj);
-            }
-
-            moveZombie(zombie) {
-                if (!zombie.alive || !this.gameRunning) return;
-
-                const interval = setInterval(() => {
-                    if (!zombie.alive || !this.gameRunning) {
-                        clearInterval(interval);
-                        return;
+                    const index = this.suns.indexOf(sunElement);
+                    if (index > -1) {
+                        this.suns.splice(index, 1);
                     }
-
-                    let hasPlant = false;
-                    for (let c = 0; c < this.cols; c++) {
-                        if (this.plants[zombie.row][c]) {
-                            const plantX = c * this.cellWidth;
-                            const zombieHitbox = {
-                                left: zombie.x,
-                                right: zombie.x + 50,
-                                top: 20,
-                                bottom: 60
-                            };
-                            
-                            if (zombieHitbox.right > plantX && zombieHitbox.left < plantX + this.cellWidth) {
-                                hasPlant = true;
-                                if (!zombie.eating) {
-                                    zombie.eating = true;
-                                    zombie.eatingPlantCol = c;
-
-                                    zombie.element.src = IMAGES.zombie_eat;
-                                    this.startEating(zombie, c);
-                                }
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!hasPlant) {
-                        if (zombie.eating) {
-                            zombie.eating = false;
-                            zombie.eatingPlantCol = -1;
-                            if (zombie.damageInterval) {
-                                clearInterval(zombie.damageInterval);
-                            }
-                            
-                            zombie.element.src = IMAGES.zombie;
-                        }
-                        zombie.x -= zombie.speed;
-                        zombie.element.style.left = `${zombie.x}px`;
-                    }
-
-                    if (zombie.x < 60) {
-                        this.activateMower(zombie.row);
-                        zombie.alive = false;
-                        zombie.element.remove();
-                        const index = this.zombies.indexOf(zombie);
-                        if (index > -1) {
-                            this.zombies.splice(index, 1);
-                        }
-                        clearInterval(interval);
-                    }
-                }, 50);
-                this.intervals.push(interval);
-            }
-
-            startEating(zombie, plantCol) {
-                if (zombie.damageInterval) {
-                    clearInterval(zombie.damageInterval);
                 }
-                
-                zombie.damageInterval = setInterval(() => {
-                    if (!zombie.alive || !this.gameRunning) {
-                        clearInterval(zombie.damageInterval);
-                        return;
-                    }
-                    
-                    if (this.plants[zombie.row][plantCol]) {
-                        this.audioManager.playChomp();
-                        
-                        const plant = this.plants[zombie.row][plantCol];
-                        
-                        let damage = 25;
-                        if (plant.type === 'egg') {
-                            damage = 50;
-                        }
-                        
-                        plant.hp -= damage;
-                        
-                        if (plant.type === 'egg') {
-                            this.updateEggPhase(plant, zombie.row, plantCol);
-                            this.spawnParticle(zombie.row, plantCol);
-                        } else {
-                            this.flashElement(plant.element, 'flash-white', 300);
-                        }
-                        
-                        if (plant.hp <= 0) {
-                            if (plant.type === 'egg') {
-                                this.updateEggPhase(plant, zombie.row, plantCol);
-                                setTimeout(() => {
-                                    if (plant.element && plant.element.parentNode) {
-                                        plant.element.remove();
-                                        this.plants[zombie.row][plantCol] = null;
-                                        document.querySelector(`.cell[data-row="${zombie.row}"][data-col="${plantCol}"]`).classList.remove('occupied');
-                                    }
-                                }, 500);
-                            } else {
-                                plant.element.remove();
-                                this.plants[zombie.row][plantCol] = null;
-                                document.querySelector(`.cell[data-row="${zombie.row}"][data-col="${plantCol}"]`).classList.remove('occupied');
-                            }
-                            
-                            zombie.eating = false;
-                            zombie.eatingPlantCol = -1;
-                            clearInterval(zombie.damageInterval);
-                            // Возвращаем анимацию ходьбы
-                            zombie.element.src = IMAGES.zombie;
-                        }
-                    } else {
-                        zombie.eating = false;
-                        zombie.eatingPlantCol = -1;
-                        clearInterval(zombie.damageInterval);
-                        // Возвращаем анимацию ходьбы
-                        zombie.element.src = IMAGES.zombie;
-                    }
-                }, 1000);
-                
-                this.intervals.push(zombie.damageInterval);
-            }
 
-            activateMower(row) {
-                const mower = this.mowers.find(m => m.row === row);
-                if (!mower || mower.active) return;
-
-                mower.active = true;
-                let x = -15;
-                const interval = setInterval(() => {
-                    if (!this.gameRunning) {
-                        clearInterval(interval);
-                        return;
-                    }
-
-                    x += 10;
-                    mower.element.style.left = `${x}px`;
-
-                    this.zombies.forEach(zombie => {
-                        if (zombie.row === row && zombie.alive) {
-                            if (Math.abs(x - zombie.x) < 40) {
-                                this.flashElement(zombie.element, 'flash-white', 300);
-                                zombie.hp -= 200;
-                                if (zombie.hp <= 0) {
-                                    zombie.alive = false;
-                                    zombie.element.remove();
-                                    if (zombie.damageInterval) {
-                                        clearInterval(zombie.damageInterval);
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    if (x > window.innerWidth + 100) {
-                        clearInterval(interval);
-                        mower.active = false;
-                        mower.element.style.left = '-15px';
-                    }
-                }, 50);
-                this.intervals.push(interval);
-            }
-
-            shootProjectile(row, col) {
-                if (!this.gameRunning) return;
-
-                const plantData = this.plants[row][col];
-                if (!plantData) return;
-
-                const originalSrc = plantData.originalSrc || IMAGES.peashooter;
-                plantData.element.src = IMAGES.peashooter_shoot;
-                plantData.element.onerror = function() {
-                    this.src = IMAGES.peashooter_fallback;
-                };
-                
-                setTimeout(() => {
-                    if (plantData.element && plantData.element.parentNode) {
-                        plantData.element.src = originalSrc;
-                        plantData.element.onerror = function() {
-                            this.src = IMAGES.peashooter_fallback;
-                        };
-                    }
-                }, 1030);
-
-                setTimeout(() => {
+                spawnZombie() {
                     if (!this.gameRunning) return;
 
-                    const projectile = document.createElement('img');
-                    projectile.src = IMAGES.projectile;
-                    projectile.className = 'projectile';
-                    const centerX = col * this.cellWidth + this.cellWidth / 2 + 10;
-                    const centerY = this.cellHeight / 2;
-                    projectile.style.left = `${centerX}px`;
-                    projectile.style.top = `${centerY - 14}px`;
+                    this.zombieCounter++;
+                    const row = Math.floor(Math.random() * this.rows);
+                    const zombie = document.createElement('img');
+                    zombie.src = IMAGES.zombie;
+                    zombie.className = 'zombie';
 
                     const rowElement = document.querySelector(`.row[data-row="${row}"]`);
-                    rowElement.appendChild(projectile);
+                    const rowWidth = rowElement.getBoundingClientRect().width;
+                    zombie.style.left = `${rowWidth + 50}px`;
+                    zombie.style.top = `${this.cellHeight / 2 - 35}px`;
 
-                    const projectileObj = {
+                    rowElement.appendChild(zombie);
+
+                    const zombieObj = {
+                        id: Date.now() + Math.random(),
                         row: row,
-                        x: centerX,
-                        element: projectile,
-                        active: true
+                        x: rowWidth + 50,
+                        hp: 200,
+                        element: zombie,
+                        alive: true,
+                        speed: 0.7,
+                        eating: false,
+                        damageInterval: null,
+                        eatingPlantCol: -1
                     };
 
-                    this.projectiles.push(projectileObj);
+                    this.zombies.push(zombieObj);
+                    this.moveZombie(zombieObj);
+                }
+
+                moveZombie(zombie) {
+                    if (!zombie.alive || !this.gameRunning) return;
 
                     const interval = setInterval(() => {
-                        if (!projectileObj.active || !this.gameRunning) {
+                        if (!zombie.alive || !this.gameRunning) {
                             clearInterval(interval);
                             return;
                         }
 
-                        projectileObj.x += 8;
-                        projectileObj.element.style.left = `${projectileObj.x}px`;
+                        let hasPlant = false;
+                        for (let c = 0; c < this.cols; c++) {
+                            if (this.plants[zombie.row][c]) {
+                                const plantX = c * this.cellWidth;
+                                const zombieHitbox = {
+                                    left: zombie.x,
+                                    right: zombie.x + 50,
+                                    top: 20,
+                                    bottom: 60
+                                };
+
+                                if (zombieHitbox.right > plantX && zombieHitbox.left < plantX + this.cellWidth) {
+                                    hasPlant = true;
+                                    if (!zombie.eating) {
+                                        zombie.eating = true;
+                                        zombie.eatingPlantCol = c;
+
+                                        zombie.element.src = IMAGES.zombie_eat;
+                                        this.startEating(zombie, c);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!hasPlant) {
+                            if (zombie.eating) {
+                                zombie.eating = false;
+                                zombie.eatingPlantCol = -1;
+                                if (zombie.damageInterval) {
+                                    clearInterval(zombie.damageInterval);
+                                }
+
+                                zombie.element.src = IMAGES.zombie;
+                            }
+                            zombie.x -= zombie.speed;
+                            zombie.element.style.left = `${zombie.x}px`;
+                        }
+
+                        if (zombie.x < 60) {
+                            this.activateMower(zombie.row);
+                            zombie.alive = false;
+                            zombie.element.remove();
+                            const index = this.zombies.indexOf(zombie);
+                            if (index > -1) {
+                                this.zombies.splice(index, 1);
+                            }
+                            clearInterval(interval);
+                        }
+                    }, 50);
+                    this.intervals.push(interval);
+                }
+
+                startEating(zombie, plantCol) {
+                    if (zombie.damageInterval) {
+                        clearInterval(zombie.damageInterval);
+                    }
+
+                    zombie.damageInterval = setInterval(() => {
+                        if (!zombie.alive || !this.gameRunning) {
+                            clearInterval(zombie.damageInterval);
+                            return;
+                        }
+
+                        if (this.plants[zombie.row][plantCol]) {
+                            this.audioManager.playChomp();
+
+                            const plant = this.plants[zombie.row][plantCol];
+
+                            let damage = 25;
+                            if (plant.type === 'egg') {
+                                damage = 50;
+                            }
+
+                            plant.hp -= damage;
+
+                            if (plant.type === 'egg') {
+                                this.updateEggPhase(plant, zombie.row, plantCol);
+                                this.spawnParticle(zombie.row, plantCol);
+                            } else {
+                                this.flashElement(plant.element, 'flash-white', 300);
+                            }
+
+                            if (plant.hp <= 0) {
+                                if (plant.type === 'egg') {
+                                    this.updateEggPhase(plant, zombie.row, plantCol);
+                                    setTimeout(() => {
+                                        if (plant.element && plant.element.parentNode) {
+                                            plant.element.remove();
+                                            this.plants[zombie.row][plantCol] = null;
+                                            document.querySelector(`.cell[data-row="${zombie.row}"][data-col="${plantCol}"]`).classList.remove('occupied');
+                                        }
+                                    }, 500);
+                                } else {
+                                    plant.element.remove();
+                                    this.plants[zombie.row][plantCol] = null;
+                                    document.querySelector(`.cell[data-row="${zombie.row}"][data-col="${plantCol}"]`).classList.remove('occupied');
+                                }
+
+                                zombie.eating = false;
+                                zombie.eatingPlantCol = -1;
+                                clearInterval(zombie.damageInterval);
+                                zombie.element.src = IMAGES.zombie;
+                            }
+                        } else {
+                            zombie.eating = false;
+                            zombie.eatingPlantCol = -1;
+                            clearInterval(zombie.damageInterval);
+                            zombie.element.src = IMAGES.zombie;
+                        }
+                    }, 1000);
+
+                    this.intervals.push(zombie.damageInterval);
+                }
+
+                activateMower(row) {
+                    const mower = this.mowers.find(m => m.row === row);
+                    if (!mower || mower.active) return;
+
+                    mower.active = true;
+                    let x = -15;
+                    const interval = setInterval(() => {
+                        if (!this.gameRunning) {
+                            clearInterval(interval);
+                            return;
+                        }
+
+                        x += 10;
+                        mower.element.style.left = `${x}px`;
 
                         this.zombies.forEach(zombie => {
                             if (zombie.row === row && zombie.alive) {
-                                if (Math.abs(projectileObj.x - zombie.x) < 30) {
-                                    zombie.hp -= 20;
-                                    projectileObj.active = false;
-                                    projectileObj.element.remove();
-                                    this.audioManager.playSound('hit');
-                                    
+                                if (Math.abs(x - zombie.x) < 40) {
                                     this.flashElement(zombie.element, 'flash-white', 300);
-                                    
+                                    zombie.hp -= 200;
                                     if (zombie.hp <= 0) {
                                         zombie.alive = false;
                                         zombie.element.remove();
@@ -1386,98 +1426,186 @@
                             }
                         });
 
-                        if (projectileObj.x > window.innerWidth + 50) {
-                            projectileObj.active = false;
-                            projectileObj.element.remove();
+                        if (x > window.innerWidth + 100) {
                             clearInterval(interval);
+                            mower.active = false;
+                            mower.element.style.left = '-15px';
                         }
-                    }, 30);
+                    }, 50);
                     this.intervals.push(interval);
-                }, 500);
-            }
-
-            checkPeashooters() {
-                const now = Date.now();
-                for (let r = 0; r < this.rows; r++) {
-                    let hasZombie = this.zombies.some(z => z.row === r && z.alive);
-                    if (hasZombie) {
-                        for (let c = 0; c < this.cols; c++) {
-                            if (this.plants[r][c] && this.plants[r][c].type === 'peashooter') {
-                                if (now - this.plants[r][c].lastShot >= 1500) {
-                                    this.plants[r][c].lastShot = now;
-                                    this.shootProjectile(r, c);
-                                }
-                            }
-                        }
-                    }
                 }
-            }
 
-            checkSunflowers() {
-                const now = Date.now();
-                for (let r = 0; r < this.rows; r++) {
-                    for (let c = 0; c < this.cols; c++) {
-                        const plant = this.plants[r][c];
-                        if (plant && plant.type === 'sunflower') {
-                            if (!plant.firstSunDone) {
-                                if (now - plant.lastSun >= plant.firstSunDelay) {
-                                    plant.firstSunDone = true;
-                                    plant.lastSun = now;
-                                    this.spawnSunFromPlant(r, c);
-                                }
-                            } else {
-                                if (now - plant.lastSun >= 24000) {
-                                    plant.lastSun = now;
-                                    this.spawnSunFromPlant(r, c);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            startGame() {
-                this.gameRunning = true;
-                
-                const firstZombieDelay = 20000;
-                
-                const zombieInterval = setInterval(() => {
-                    if (this.gameRunning) {
-                        if (Date.now() - this.gameStartTime >= firstZombieDelay) {
-                            this.spawnZombie();
-                            
-                            if (this.zombieCounter % 10 === 0) {
-                                this.waveNumber++;
-                            }
-                        }
-                    }
-                }, 8000);
-                this.intervals.push(zombieInterval);
-
-                const firstZombie = setTimeout(() => {
-                    if (this.gameRunning) {
-                        this.spawnZombie();
-                    }
-                }, firstZombieDelay);
-                this.timeouts.push(firstZombie);
-
-                const sunInterval = setInterval(() => {
-                    if (this.gameRunning) {
-                        this.spawnSun();
-                    }
-                }, 5000);
-                this.intervals.push(sunInterval);
-
-                const gameLoop = setInterval(() => {
+                shootProjectile(row, col) {
                     if (!this.gameRunning) return;
-                    this.checkPeashooters();
-                    this.checkSunflowers();
-                }, 100);
-                this.intervals.push(gameLoop);
-            }
-        }
 
-        const game = new Game();
+                    const plantData = this.plants[row][col];
+                    if (!plantData) return;
+
+                    const originalSrc = plantData.originalSrc || IMAGES.peashooter;
+                    plantData.element.src = IMAGES.peashooter_shoot;
+                    plantData.element.onerror = function() {
+                        this.src = IMAGES.peashooter_fallback;
+                    };
+
+                    setTimeout(() => {
+                        if (plantData.element && plantData.element.parentNode) {
+                            plantData.element.src = originalSrc;
+                            plantData.element.onerror = function() {
+                                this.src = IMAGES.peashooter_fallback;
+                            };
+                        }
+                    }, 1030);
+
+                    setTimeout(() => {
+                        if (!this.gameRunning) return;
+
+                        const projectile = document.createElement('img');
+                        projectile.src = IMAGES.projectile;
+                        projectile.className = 'projectile';
+                        const centerX = col * this.cellWidth + this.cellWidth / 2 + 10;
+                        const centerY = this.cellHeight / 2;
+                        projectile.style.left = `${centerX}px`;
+                        projectile.style.top = `${centerY - 14}px`;
+
+                        const rowElement = document.querySelector(`.row[data-row="${row}"]`);
+                        rowElement.appendChild(projectile);
+
+                        const projectileObj = {
+                            row: row,
+                            x: centerX,
+                            element: projectile,
+                            active: true
+                        };
+
+                        this.projectiles.push(projectileObj);
+
+                        const interval = setInterval(() => {
+                            if (!projectileObj.active || !this.gameRunning) {
+                                clearInterval(interval);
+                                return;
+                            }
+
+                            projectileObj.x += 8;
+                            projectileObj.element.style.left = `${projectileObj.x}px`;
+
+                            this.zombies.forEach(zombie => {
+                                if (zombie.row === row && zombie.alive) {
+                                    if (Math.abs(projectileObj.x - zombie.x) < 30) {
+                                        zombie.hp -= 20;
+                                        projectileObj.active = false;
+                                        projectileObj.element.remove();
+                                        this.audioManager.playSound('hit');
+
+                                        this.flashElement(zombie.element, 'flash-white', 300);
+
+                                        if (zombie.hp <= 0) {
+                                            zombie.alive = false;
+                                            zombie.element.remove();
+                                            if (zombie.damageInterval) {
+                                                clearInterval(zombie.damageInterval);
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                            if (projectileObj.x > window.innerWidth + 50) {
+                                projectileObj.active = false;
+                                projectileObj.element.remove();
+                                clearInterval(interval);
+                            }
+                        }, 30);
+                        this.intervals.push(interval);
+                    }, 500);
+                }
+
+                checkPeashooters() {
+                    const now = Date.now();
+                    for (let r = 0; r < this.rows; r++) {
+                        let hasZombie = this.zombies.some(z => z.row === r && z.alive);
+                        if (hasZombie) {
+                            for (let c = 0; c < this.cols; c++) {
+                                if (this.plants[r][c] && this.plants[r][c].type === 'peashooter') {
+                                    if (now - this.plants[r][c].lastShot >= 1500) {
+                                        this.plants[r][c].lastShot = now;
+                                        this.shootProjectile(r, c);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                checkSunflowers() {
+                    const now = Date.now();
+                    for (let r = 0; r < this.rows; r++) {
+                        for (let c = 0; c < this.cols; c++) {
+                            const plant = this.plants[r][c];
+                            if (plant && plant.type === 'sunflower') {
+                                if (!plant.firstSunDone) {
+                                    if (now - plant.lastSun >= plant.firstSunDelay) {
+                                        plant.firstSunDone = true;
+                                        plant.lastSun = now;
+                                        this.spawnSunFromPlant(r, c);
+                                    }
+                                } else {
+                                    if (now - plant.lastSun >= 24000) {
+                                        plant.lastSun = now;
+                                        this.spawnSunFromPlant(r, c);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                startGame() {
+                    this.gameRunning = true;
+                    this.gameStartTime = Date.now();
+
+                    const firstZombieDelay = 20000;
+
+                    const zombieInterval = setInterval(() => {
+                        if (this.gameRunning) {
+                            if (Date.now() - this.gameStartTime >= firstZombieDelay) {
+                                this.spawnZombie();
+
+                                if (this.zombieCounter % 10 === 0) {
+                                    this.waveNumber++;
+                                }
+                            }
+                        }
+                    }, 8000);
+                    this.intervals.push(zombieInterval);
+
+                    const firstZombie = setTimeout(() => {
+                        if (this.gameRunning) {
+                            this.spawnZombie();
+                        }
+                    }, firstZombieDelay);
+                    this.timeouts.push(firstZombie);
+
+                    const sunInterval = setInterval(() => {
+                        if (this.gameRunning) {
+                            this.spawnSun();
+                        }
+                    }, 5000);
+                    this.intervals.push(sunInterval);
+
+                    const gameLoop = setInterval(() => {
+                        if (!this.gameRunning) return;
+                        this.checkPeashooters();
+                        this.checkSunflowers();
+                    }, 100);
+                    this.intervals.push(gameLoop);
+                }
+            }
+
+            window.addEventListener('load', () => {
+                const game = new Game();
+                window.__game = game;
+            });
+        })();
     </script>
 </body>
 </html>
