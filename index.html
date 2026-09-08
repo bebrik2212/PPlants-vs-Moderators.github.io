@@ -446,8 +446,8 @@
 
         .zombie {
             position: absolute;
-            width: 60px;
-            height: 70px;
+            width: 100px;      
+            height: 115px;     
             object-fit: contain;
             z-index: 7;
             pointer-events: none;
@@ -603,6 +603,11 @@
             .seed-image {
                 height: 40px;
             }
+            
+            .zombie {
+                width: 70px;
+                height: 80px;
+            }
         }
 
         @media (max-width: 500px) {
@@ -650,6 +655,10 @@
             }
             .seed-bank {
                 gap: 2px;
+            }
+            .zombie {
+                width: 60px;
+                height: 70px;
             }
         }
     </style>
@@ -776,11 +785,9 @@
                     this.musicEnabled = !this.musicEnabled;
                     
                     if (!this.musicEnabled) {
-
                         this.menuMusic.pause();
                         this.backgroundMusic.pause();
                     } else {
-                 
                         const menuOverlay = document.getElementById('menuOverlay');
                         if (menuOverlay && !menuOverlay.classList.contains('hidden')) {
                             this.playMenuMusic();
@@ -1340,7 +1347,8 @@
                     const rowElement = document.querySelector(`.row[data-row="${row}"]`);
                     const rowWidth = rowElement.getBoundingClientRect().width;
                     zombie.style.left = `${rowWidth + 50}px`;
-                    zombie.style.top = `${this.cellHeight / 2 - 35}px`;
+                   
+                    zombie.style.top = `${this.cellHeight / 2 - 57}px`;
 
                     rowElement.appendChild(zombie);
 
@@ -1376,9 +1384,9 @@
                                 const plantX = c * this.cellWidth;
                                 const zombieHitbox = {
                                     left: zombie.x,
-                                    right: zombie.x + 50,
+                                    right: zombie.x + 90,
                                     top: 20,
-                                    bottom: 60
+                                    bottom: 95
                                 };
 
                                 if (zombieHitbox.right > plantX && zombieHitbox.left < plantX + this.cellWidth) {
