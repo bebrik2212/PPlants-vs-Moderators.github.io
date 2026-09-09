@@ -930,8 +930,8 @@
                         const plantRect = plantData.element.getBoundingClientRect();
                         const rowElement = document.querySelector(`.row[data-row="${row}"]`);
                         const rowRect = rowElement.getBoundingClientRect();
-                        const sunX = plantRect.left - rowRect.left + plantRect.width / 2 - 30;
-                        const sunY = plantRect.top - rowRect.top + plantRect.height / 2 - 30;
+                        const sunX = plantRect.left - rowRect.left + plantRect.width / 2 - 40;
+                        const sunY = plantRect.top - rowRect.top + plantRect.height / 2 - 40;
                         sun.style.left = `${sunX}px`;
                         sun.style.top = `${sunY}px`;
                         sun.style.cursor = 'pointer';
